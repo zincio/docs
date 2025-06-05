@@ -16,9 +16,9 @@
           {
             "group": "Get Started",
             "pages": [
-              "get-started/index",
-              "get-started/what-is-zinc",
-              "get-started/quickstart"
+              "index",
+              "what-is-zinc",
+              "quickstart"
             ]
           },
           {

@@ -2,4 +2,23 @@
 title: "Authentication"
 description: "How to authenticate with the Zinc API."
 icon: "key"
---- 
+---
+
+To use the Zinc API, you must authenticate every request with your client token.
+
+## Example Authentication Request
+
+```bash
+curl https://api.zinc.io/v1/orders \
+  -u <client_token>:
+```
+
+Authentication is performed using **HTTP Basic Auth**.  
+- Your **client token** is used as the username.
+- The password field should be left blank.
+
+<Alert type="warning">
+Never share your client token or expose it in public repositories, client-side code, or other insecure locations. Your client token is tied to your account, and you are responsible for all requests made with it.
+</Alert>
+
+If you believe your client token has been compromised, please contact [support@zinc.io](mailto:support@zinc.io) immediately. 

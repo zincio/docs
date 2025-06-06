@@ -1,5 +1,66 @@
 ---
 title: "Accounts & Payments"
-description: "How to select offers and shipping options when placing orders."
+description: "How to pay for purchases with Zinc"
 icon: "dollar-sign"
---- 
+---
+
+When integrating with Zinc, you have two options for paying for purchases:
+
+## 1. Bring Your Own Account
+
+You provide your own retailer account credentials (e.g., Amazon username and password) and Zinc will place orders on your behalf using your account.
+
+**Benefits:**
+- Full control over your orders and account.
+- Use your own payment methods (e.g., credit cards for cashback, points, etc.).
+- Access to your retailer's loyalty programs and purchase history.
+
+**Considerations:**
+- You are responsible for maintaining your retailer accounts.
+- Retailers may occasionally lock or restrict accounts due to high activity or policy changes.
+
+---
+
+## 2. Zinc Managed Accounts (ZMA)
+
+Let Zinc handle everything. With ZMA, you fund a balance with Zinc (via PayPal or wire transfer), and Zinc places orders using its own managed retailer accounts.
+
+**Benefits:**
+- No need to create or manage your own retailer accounts.
+- Zinc handles account maintenance, order placement, and fulfillment.
+- Reduced risk of account shutdowns or interruptions.
+
+**How it works:**
+1. **Fund your account:**  
+   Add funds to your Zinc balance via PayPal or wire transfer.  
+   - Check your balance:  
+     ```bash
+     curl "https://api.zinc.io/v1/addax/balance" -u <client_token>:
+     ```
+   - View transactions:  
+     ```bash
+     curl "https://api.zinc.io/v1/addax/transactions?count=100&offset=0" -u <client_token>:
+     ```
+   - Contact [sales@zinc.io](mailto:sales@zinc.io) to set up funding options.
+
+2. **Place an order:**  
+   - Add `"addax": true` to your order request body.
+   - Do **not** include `retailer_credentials`, `payment_method`, or `billing_address`.
+   - All other order features work as usual.
+
+3. **Order processing:**  
+   - Orders are queued until a suitable fulfillment account is available.
+   - If an order cannot be fulfilled in time, you'll receive a `zma_temporarily_overloaded` error.
+
+4. **Cases & support:**  
+   - If an order is cancelled, returned, or needs follow-up, Zinc will open a "case" for you.
+   - You can check or update case status via the API.
+
+**Considerations:**
+- ZMA is currently available for Amazon.com only.
+- You'll still be billed the normal ordering fee at the end of the month.
+- For more details, see [Zinc Managed Accounts documentation](/api-reference/introduction/accounts-payments) or contact [sales@zinc.io](mailto:sales@zinc.io).
+
+---
+
+Choose the integration that best fits your business needs. If you're unsure, [contact us](mailto:support@zinc.io) and we'll help you decide! 

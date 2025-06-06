@@ -1,108 +1,31 @@
 ---
-title: 'What is Zinc?'
-description: 'Preview changes locally to update your docs'
-icon: "box"
+title: "What is Zinc?"
+description: "Zinc is the universal API for e-commerce automation. With a single integration, you can buy products, retrieve pricing and product data, and automate order management across the world's top online retailers — including Amazon, Walmart, Costco, and more."
+icon: "circle-question"
 ---
 
-<Info>
-  **Prerequisite**: Please install Node.js (version 19 or higher) before proceeding. <br />
-  Please upgrade to ```docs.json``` before proceeding and delete the legacy ```mint.json``` file.
-</Info>
+## Why Zinc?
 
-Follow these steps to install and run Mintlify on your operating system:
+- **Unified API:** Access millions of products with one consistent, modern REST API.
+- **Automate Everything:** Place orders, track shipments, handle returns, and manage cancellations programmatically.
+- **Real-Time Product Data:** Instantly fetch up-to-date product details, offers, and prices at scale.
+- **Enterprise-Grade Reliability:** Built for high-volume, mission-critical workflows with robust error handling and idempotency.
+- **Developer-First:** Clear documentation, fast onboarding, and responsive support.
 
-**Step 1**: Install Mintlify:
+## Who Uses Zinc?
 
-<CodeGroup>
+- **Cross Border:** Enable global e-commerce by purchasing and shipping products internationally.
+- **AI:** Power intelligent agents and automation platforms that buy, compare, and manage products programmatically.
+- **Gifts + Rewards:** Automate the delivery of gifts, incentives, and rewards to customers or employees at scale.
+- **Price Tracking:** Monitor product prices and availability across retailers for dynamic pricing, alerts, or analytics.
+- **Social Shopping:** Build platforms where users can discover, share, and purchase products collaboratively.
 
-  ```bash npm
-  npm i -g mintlify
-  ```
+## How Does It Work?
 
-```bash yarn
-yarn global add mintlify
-```
+1. **[Sign up](https://dash.zinc.io/signup)** for a Zinc account and get your API credentials.
+2. **[Authenticate](https://docs.zinc.io/api-reference/introduction/authentication)** using your client token.
+3. **[Make API calls](https://docs.zinc.io/api-reference/introduction/authentication)** to place orders, search for products, or retrieve data.
+4. **[Receive real-time updates](https://docs.zinc.io/api-reference/introduction/webhooks)** via webhooks or polling.
 
-</CodeGroup>
-
-**Step 2**: Navigate to the docs directory (where the `docs.json` file is located) and execute the following command:
-
-```bash
-mintlify dev
-```
-
-A local preview of your documentation will be available at `http://localhost:3000`.
-
-### Custom Ports
-
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. To run Mintlify on port 3333, for instance, use this command:
-
-```bash
-mintlify dev --port 3333
-```
-
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
-
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Mintlify Versions
-
-Please note that each CLI release is associated with a specific version of Mintlify. If your local website doesn't align with the production version, please update the CLI:
-
-<CodeGroup>
-
-```bash npm
-npm i -g mintlify@latest
-```
-
-```bash yarn
-yarn global upgrade mintlify
-```
-
-</CodeGroup>
-
-## Validating Links
-
-The CLI can assist with validating reference links made in your documentation. To identify any broken links, use the following command:
-
-```bash
-mintlify broken-links
-```
-
-## Deployment
-
-<Tip>
-  Unlimited editors available under the [Pro
-  Plan](https://mintlify.com/pricing) and above.
-</Tip>
-
-If the deployment is successful, you should see the following:
-
-<Frame>
-  <img src="/images/checks-passed.png" style={{ borderRadius: '0.5rem' }} />
-</Frame>
-
-## Code Formatting
-
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
-
-    This may be due to an outdated version of node. Try the following:
-    1. Remove the currently-installed version of mintlify: `npm remove -g mintlify`
-    2. Upgrade to Node v19 or higher.
-    3. Reinstall mintlify: `npm install -g mintlify`
-  </Accordion>
-
-  <Accordion title="Issue: Encountering an unknown error">
-  
-    Solution: Go to the root of your device and delete the \~/.mintlify folder. Afterwards, run `mintlify dev` again.
-  </Accordion>
-</AccordionGroup>
-
-Curious about what changed in the CLI version? [Check out the CLI changelog.](https://www.npmjs.com/package/mintlify?activeTab=versions)
+> **Ready to get started?**  
+> Check out the [Quickstart guide](/quickstart) or dive into the [API Reference](/api-reference/introduction/authentication).

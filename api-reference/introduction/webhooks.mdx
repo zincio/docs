@@ -2,4 +2,56 @@
 title: "Webhooks"
 description: "Receive real-time updates from the Zinc API using webhooks."
 icon: "webhook"
---- 
+---
+
+Webhooks let you receive real-time notifications from the Zinc API whenever important events occur (such as order status changes, tracking updates, or failures).
+
+To use webhooks, include a `webhooks` object in your API request. This object specifies the event types you want to listen for and the URLs to notify.
+
+**What you send:**  
+The `webhooks` object in your request, specifying which events you want to receive and where.
+
+**What you receive:**  
+When an event occurs, Zinc sends a `POST` request to your specified URL(s). The body of the webhook is the same as the standard JSON response for that event (see [Object Reference](/api-reference/objects/order), etc.).
+
+## Example Webhooks Object
+
+```json
+{
+  "request_succeeded": "https://example.com/zinc/request_placed",
+  "request_failed": "https://example.com/zinc/request_failed",
+  "tracking_obtained": "https://example.com/zinc/tracking_obtained",
+  "tracking_updated": "https://example.com/zinc/tracking_updated",
+  "status_updated": "https://example.com/zinc/status_updated",
+  "case_updated": "https://example.com/zinc/case_updated"
+}
+```
+
+## Webhook Event Types
+
+| Event           | Type   | Description                                                                                   |
+|:---------------------|:--------|:-----------------------------------------------------------------------------------------------|
+| `request_succeeded`   | `String` | Webhook URL for when a request succeeds                                                       |
+| `order_placed`        | `String` | (deprecated) Synonym for request_succeeded (orders only)                                      |
+| `request_failed`      | `String` | Webhook URL for when a request fails                                                          |
+| `order_failed`        | `String` | (deprecated) Synonym for request_failed (orders only)                                         |
+| `tracking_obtained`   | `String` | Webhook URL for when ALL tracking for an order is retrieved (orders only)                     |
+| `tracking_updated`    | `String` | Webhook URL for when ANY tracking for an order is retrieved (orders only)                     |
+| `status_updated`      | `String` | Webhook URL for when the status of a request is updated                                       |
+| `case_updated`        | `String` | Webhook URL for when a ZMA case associated with the order receives an update                  |
+
+<Note>
+The <code>case_updated</code> webhook is specifically for ZMA order cases.
+</Note>
+
+- You can pass an **array of URLs** for any webhook type; Zinc will notify all of them.
+- Webhooks have **"at least once" delivery**—your endpoint may receive the same event more than once. Deduplicate on your end if needed.
+- Webhooks are **not signed**. For security, you can:
+  - Include a secret query parameter or HTTP basic auth in your webhook URL (e.g., `https://user:password@example.com/zinc/tracking_obtained`)
+  - Use the webhook as a trigger and re-fetch the event data from the API for verification.
+
+<Info>
+If no URL is specified for a webhook type, no notification will be sent for that event.
+</Info>
+
+For more details or advanced webhook usage, contact [support@zinc.io](mailto:support@zinc.io).

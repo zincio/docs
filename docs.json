@@ -95,11 +95,5 @@
       "label": "Dashboard",
       "href": "https://dash.zinc.io"
     }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/zincapi",
-      "linkedin": "https://linkedin.com/company/zincapi"
-    }
   }
 }

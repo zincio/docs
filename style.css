@@ -1,3 +1,34 @@
 #footer {
     display: none;
 }
+
+:root {
+  --primary: 56 109 240;           /* #386DF0 */
+  --primary-light: 255 254 249;    /* #FFFEF9 */
+  --primary-dark: 41 39 36;        /* #292724 */
+  --background-light: 255 254 249; /* #FFFEF9 (matches your lightest) */
+  --background-dark: 41 39 36;     /* #292724 (main text/dark) */
+
+  /* Greys from your palette */
+  /* --gray-50: #FCFBF5;
+  --gray-100: #F9F6EB;
+  --gray-200: #E6E4D9;
+  --gray-300: #CFCDC4;
+  --gray-400: #959389;
+  --gray-500: #646058;
+  --gray-600: #45423D;
+  --gray-700: #35322D;
+  --gray-800: #1E1D1B;
+  --gray-900: #151412;
+  --gray-950: #0C0B0A; */
+}
+
+
+
+
+
+
+
+
+
+

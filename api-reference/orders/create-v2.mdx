@@ -1,0 +1,73 @@
+---
+title: "Create Order (v2)"
+description: "Endpoint to create a new order via the Zinc API v2."
+openapi: "/api-reference/openapi.v2.json POST /v2/orders"
+---
+
+## Create Order (v2)
+
+This is the v2 version of the Create Order endpoint. It uses the v2 OpenAPI specification.
+
+<Note>
+  This is a demo version showing how versioning works in Mintlify. Only the Create Order endpoint is available in v2.
+</Note>
+
+## Order Status Flow
+
+<img src="/images/orders.png" alt="Order Status Flow" />
+
+## Example Request
+
+```bash
+curl -X POST https://api.zinc.io/v1/orders \
+  -u <client_token>: \
+  -H "Content-Type: application/json" \
+  -d '{
+    "retailer": "amazon",
+    "products": [
+      {
+        "product_id": "B000NPYY04",
+        "quantity": 1
+      }
+    ],
+    "shipping_address": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "address_line1": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zip_code": "10001",
+      "country": "US"
+    },
+    "billing_address": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "address_line1": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zip_code": "10001",
+      "country": "US"
+    },
+    "payment_method": {
+      "name_on_card": "John Doe",
+      "number": "4111111111111111",
+      "security_code": "123",
+      "expiration_month": 12,
+      "expiration_year": 2025
+    },
+    "retailer_credentials": {
+      "email": "user@example.com",
+      "password": "password123"
+    },
+    "max_price": 5000,
+    "shipping_method": "cheapest"
+  }'
+```
+
+## Example Response
+
+```json
+{
+  "request_id": "req_123456789"
+}
+``` 

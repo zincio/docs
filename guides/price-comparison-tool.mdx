@@ -1,0 +1,408 @@
+---
+title: 'Building a Price Comparison Tool'
+description: 'Learn how to build a real-time price comparison tool using Zinc API to monitor and compare product prices across multiple retailers.'
+icon: 'chart-line'
+---
+
+This guide shows you how to build a price comparison tool that monitors product prices across multiple retailers using Zinc's Product Search and Offers APIs.
+
+<Alert type="info">
+  This guide assumes you have a Zinc account and API credentials. <a href="https://dash.zinc.io/signup" target="_blank">Sign up here</a> if you haven't already.
+</Alert>
+
+## Overview
+
+Your price comparison tool will:
+- Search for products across multiple retailers
+- Fetch real-time pricing and availability data
+- Compare prices and identify the best deals
+- Track price changes over time
+- Send notifications when prices drop
+
+## Architecture
+
+<CardGroup cols={2}>
+  <Card title="Product Search" icon="magnifying-glass">
+    Use Zinc's search API to find products across retailers
+  </Card>
+  <Card title="Price Monitoring" icon="chart-line">
+    Fetch current offers and pricing data for comparison
+  </Card>
+  <Card title="Data Storage" icon="database">
+    Store historical price data for trend analysis
+  </Card>
+  <Card title="Notifications" icon="bell">
+    Alert users when prices drop below thresholds
+  </Card>
+</CardGroup>
+
+## Step 1: Search for Products
+
+Start by searching for products across multiple retailers:
+
+```bash
+# Search for a product across multiple retailers
+curl 'https://api.zinc.io/v1/search?query=macbook%20pro&page=1&retailer=amazon' \
+  -u <client_token>:
+
+curl 'https://api.zinc.io/v1/search?query=macbook%20pro&page=1&retailer=walmart' \
+  -u <client_token>:
+```
+
+<CodeGroup>
+
+```javascript Node.js
+const axios = require('axios');
+
+async function searchProducts(query, retailers = ['amazon', 'walmart']) {
+  const results = [];
+  
+  for (const retailer of retailers) {
+    try {
+      const response = await axios.get(`https://api.zinc.io/v1/search`, {
+        params: { query, page: 1, retailer },
+        auth: { username: process.env.ZINC_CLIENT_TOKEN, password: '' }
+      });
+      
+      results.push({
+        retailer,
+        products: response.data.products
+      });
+    } catch (error) {
+      console.error(`Error searching ${retailer}:`, error.message);
+    }
+  }
+  
+  return results;
+}
+```
+
+```python Python
+import requests
+import os
+
+def search_products(query, retailers=['amazon', 'walmart']):
+    results = []
+    
+    for retailer in retailers:
+        try:
+            response = requests.get(
+                'https://api.zinc.io/v1/search',
+                params={'query': query, 'page': 1, 'retailer': retailer},
+                auth=(os.getenv('ZINC_CLIENT_TOKEN'), '')
+            )
+            response.raise_for_status()
+            
+            results.append({
+                'retailer': retailer,
+                'products': response.json()['products']
+            })
+        except requests.RequestException as e:
+            print(f"Error searching {retailer}: {e}")
+    
+    return results
+```
+
+</CodeGroup>
+
+## Step 2: Fetch Detailed Product Data
+
+Once you have product IDs, fetch detailed pricing and availability information:
+
+```bash
+# Get detailed product information including offers
+curl 'https://api.zinc.io/v1/products/details?product_id=ABC123&retailer=amazon' \
+  -u <client_token>:
+
+curl 'https://api.zinc.io/v1/products/offers?product_id=ABC123&retailer=amazon' \
+  -u <client_token>:
+```
+
+<CodeGroup>
+
+```javascript Node.js
+async function getProductDetails(productId, retailer) {
+  try {
+    // Get product details
+    const detailsResponse = await axios.get(`https://api.zinc.io/v1/products/details`, {
+      params: { product_id: productId, retailer },
+      auth: { username: process.env.ZINC_CLIENT_TOKEN, password: '' }
+    });
+    
+    // Get current offers
+    const offersResponse = await axios.get(`https://api.zinc.io/v1/products/offers`, {
+      params: { product_id: productId, retailer },
+      auth: { username: process.env.ZINC_CLIENT_TOKEN, password: '' }
+    });
+    
+    return {
+      details: detailsResponse.data,
+      offers: offersResponse.data.offers
+    };
+  } catch (error) {
+    console.error(`Error fetching product data:`, error.message);
+    return null;
+  }
+}
+```
+
+```python Python
+def get_product_details(product_id, retailer):
+    try:
+        # Get product details
+        details_response = requests.get(
+            'https://api.zinc.io/v1/products/details',
+            params={'product_id': product_id, 'retailer': retailer},
+            auth=(os.getenv('ZINC_CLIENT_TOKEN'), '')
+        )
+        details_response.raise_for_status()
+        
+        # Get current offers
+        offers_response = requests.get(
+            'https://api.zinc.io/v1/products/offers',
+            params={'product_id': product_id, 'retailer': retailer},
+            auth=(os.getenv('ZINC_CLIENT_TOKEN'), '')
+        )
+        offers_response.raise_for_status()
+        
+        return {
+            'details': details_response.json(),
+            'offers': offers_response.json()['offers']
+        }
+    except requests.RequestException as e:
+        print(f"Error fetching product data: {e}")
+        return None
+```
+
+</CodeGroup>
+
+## Step 3: Compare Prices
+
+Create a function to compare prices across retailers and identify the best deals:
+
+```javascript
+function comparePrices(products) {
+  const comparisons = [];
+  
+  // Group products by similar titles/ASINs
+  const productGroups = groupSimilarProducts(products);
+  
+  for (const [productKey, group] of Object.entries(productGroups)) {
+    const offers = [];
+    
+    for (const product of group) {
+      if (product.offers && product.offers.length > 0) {
+        const bestOffer = product.offers.reduce((best, offer) => 
+          offer.price < best.price ? offer : best
+        );
+        
+        offers.push({
+          retailer: product.retailer,
+          price: bestOffer.price,
+          currency: bestOffer.currency,
+          availability: bestOffer.availability,
+          shipping: bestOffer.shipping_cost || 0
+        });
+      }
+    }
+    
+    if (offers.length > 1) {
+      // Sort by total price (price + shipping)
+      offers.sort((a, b) => (a.price + a.shipping) - (b.price + b.shipping));
+      
+      comparisons.push({
+        productKey,
+        offers,
+        bestDeal: offers[0],
+        savings: offers.length > 1 ? 
+          (offers[1].price + offers[1].shipping) - (offers[0].price + offers[0].shipping) : 0
+      });
+    }
+  }
+  
+  return comparisons;
+}
+```
+
+## Step 4: Set Up Price Monitoring
+
+Create a monitoring system that tracks price changes over time:
+
+```javascript
+class PriceMonitor {
+  constructor() {
+    this.priceHistory = new Map();
+  }
+  
+  async trackProduct(productId, retailer, targetPrice = null) {
+    const currentData = await getProductDetails(productId, retailer);
+    
+    if (!currentData || !currentData.offers.length) {
+      return null;
+    }
+    
+    const currentPrice = currentData.offers[0].price;
+    const timestamp = new Date().toISOString();
+    
+    // Store price history
+    if (!this.priceHistory.has(productId)) {
+      this.priceHistory.set(productId, []);
+    }
+    
+    this.priceHistory.get(productId).push({
+      price: currentPrice,
+      timestamp,
+      retailer
+    });
+    
+    // Check if price dropped below target
+    if (targetPrice && currentPrice <= targetPrice) {
+      await this.sendPriceAlert(productId, currentPrice, targetPrice);
+    }
+    
+    return {
+      productId,
+      currentPrice,
+      priceHistory: this.priceHistory.get(productId),
+      priceDrop: this.calculatePriceDrop(productId)
+    };
+  }
+  
+  calculatePriceDrop(productId) {
+    const history = this.priceHistory.get(productId);
+    if (!history || history.length < 2) return 0;
+    
+    const latest = history[history.length - 1].price;
+    const previous = history[history.length - 2].price;
+    
+    return previous - latest;
+  }
+  
+  async sendPriceAlert(productId, currentPrice, targetPrice) {
+    // Implement your notification logic here
+    console.log(`🎉 Price alert! ${productId} is now $${currentPrice} (target: $${targetPrice})`);
+  }
+}
+```
+
+## Step 5: Build the User Interface
+
+Create a simple web interface to display price comparisons:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Price Comparison Tool</title>
+    <style>
+        .price-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+        .best-price {
+            border-color: #386DF0;
+            background-color: #f8fafc;
+        }
+        .price-drop {
+            color: #16a34a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Price Comparison Tool</h1>
+        <input type="text" id="searchInput" placeholder="Search for products...">
+        <button onclick="searchProducts()">Search</button>
+        <div id="results"></div>
+    </div>
+    
+    <script>
+        async function searchProducts() {
+            const query = document.getElementById('searchInput').value;
+            const results = await fetch('/api/search?q=' + encodeURIComponent(query));
+            const data = await results.json();
+            
+            displayResults(data);
+        }
+        
+        function displayResults(comparisons) {
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+            
+            comparisons.forEach(comparison => {
+                const card = document.createElement('div');
+                card.className = 'price-card';
+                
+                card.innerHTML = `
+                    <h3>${comparison.productKey}</h3>
+                    ${comparison.offers.map((offer, index) => `
+                        <div class="${index === 0 ? 'best-price' : ''}">
+                            <strong>${offer.retailer}</strong>: $${offer.price}
+                            ${offer.shipping > 0 ? ` + $${offer.shipping} shipping` : ''}
+                            ${index === 0 ? '  Best Price' : ''}
+                        </div>
+                    `).join('')}
+                    ${comparison.savings > 0 ? 
+                        `<div class="price-drop">Save $${comparison.savings.toFixed(2)}</div>` : ''}
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Rate Limiting" icon="clock">
+    Respect Zinc's rate limits and implement exponential backoff for retries
+  </Card>
+  <Card title="Caching" icon="database">
+    Cache product data to reduce API calls and improve performance
+  </Card>
+  <Card title="Error Handling" icon="exclamation-triangle">
+    Implement robust error handling for network issues and API failures
+  </Card>
+  <Card title="Data Validation" icon="check-circle">
+    Validate API responses and handle missing or incomplete data gracefully
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="bell" href="/api-reference/introduction/webhooks">
+    Set up webhooks to receive real-time price updates
+  </Card>
+  <Card title="Advanced Analytics" icon="chart-bar" href="/guides/product-data">
+    Add price trend analysis and forecasting features
+  </Card>
+  <Card title="Mobile App" icon="mobile">
+    Extend your tool with a mobile app for on-the-go price checking
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/products/search">
+    Explore all available endpoints for more advanced features
+  </Card>
+</CardGroup>
+
+---
+
+**Need help?** <a href="mailto:support@zinc.io">Contact support</a> or check out our other [guides](/guides) for more examples.
+```
+
+This guide follows your documentation patterns with:
+- Modern, developer-friendly language
+- Practical code examples in multiple languages
+- Clear step-by-step instructions
+- Native Mintlify components (CardGroup, Card, Alert, CodeGroup)
+- Consistent styling and structure
+- Links to related documentation
+- Best practices and next steps
+
+The guide is comprehensive yet concise, focusing on real-world implementation while maintaining the professional tone of your existing docs. 

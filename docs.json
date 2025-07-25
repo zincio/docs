@@ -3,76 +3,110 @@
   "theme": "mint",
   "name": "Zinc API Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#386DF0",
+    "light": "#FFFEF9",  
+    "dark": "#292724"    
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "tabs": [
+    "versions": [
       {
-        "tab": "Guides",
-        "groups": [
+        "version": "1.0.0",
+        "tabs": [
           {
-            "group": "Getting Started",
-            "pages": [
-              "index",
-              "what-is-zinc",
-              "quickstart",
-              "supported-retailers"
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "index",
+                  "what-is-zinc",
+                  "quickstart",
+                  "supported-retailers"
+                ]
+              }
             ]
           },
           {
-            "group": "Guides",
-            "pages": [
-              "guides/product-search",
-              "guides/product-data",
-              "guides/price-search",
-              "guides/automated-ordering",
-              "guides/tracking-cancellations-returns"
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": [
+                  "api-reference/introduction/authentication",
+                  "api-reference/introduction/idempotency",
+                  "api-reference/introduction/error-handling",
+                  "api-reference/introduction/rate-limits",
+                  "api-reference/introduction/webhooks",
+                  "api-reference/introduction/accounts-payments"
+                ]
+              },
+              {
+                "group": "Orders",
+                "pages": [
+                  "api-reference/orders/create",
+                  "api-reference/orders/retrieve",
+                  "api-reference/orders/list",
+                  "api-reference/orders/abort",
+                  "api-reference/orders/retry"
+                ]
+              },
+              {
+                "group": "Cancellations & Returns",
+                "pages": [
+                  "api-reference/cancellations/create",
+                  "api-reference/cancellations/retrieve",
+                  "api-reference/returns/create",
+                  "api-reference/returns/retrieve"
+                ]
+              },
+              {
+                "group": "Product Data",
+                "pages": [
+                  "api-reference/products/details",
+                  "api-reference/products/offers",
+                  "api-reference/products/search"
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
-        "groups": [
+        "version": "2.0.0 • Beta",
+       
+        "tabs": [
           {
-            "group": "Introduction",
-            "pages": [
-              "api-reference/introduction/authentication",
-              "api-reference/introduction/idempotency",
-              "api-reference/introduction/error-handling",
-              "api-reference/introduction/rate-limits",
-              "api-reference/introduction/webhooks",
-              "api-reference/introduction/accounts-payments"
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "index-v2"
+                ]
+              }
             ]
           },
           {
-            "group": "Orders",
-            "pages": [
-              "api-reference/orders/create",
-              "api-reference/orders/retrieve",
-              "api-reference/orders/list",
-              "api-reference/orders/abort",
-              "api-reference/orders/retry"
-            ]
-          },
-          {
-            "group": "Cancellations & Returns",
-            "pages": [
-              "api-reference/cancellations/create",
-              "api-reference/cancellations/retrieve",
-              "api-reference/returns/create",
-              "api-reference/returns/retrieve"
-            ]
-          },
-          {
-            "group": "Product Data",
-            "pages": [
-              "api-reference/products/details",
-              "api-reference/products/offers",
-              "api-reference/products/search"
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": [
+                  "api-reference/introduction/authentication",
+                  "api-reference/introduction/idempotency",
+                  "api-reference/introduction/error-handling",
+                  "api-reference/introduction/rate-limits",
+                  "api-reference/introduction/webhooks",
+                  "api-reference/introduction/accounts-payments"
+                ]
+              },
+              {
+                "group": "Orders",
+                "pages": [
+                  "api-reference/orders/create-v2"
+                ]
+              }
             ]
           }
         ]
@@ -80,8 +114,8 @@
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/mintlify.png",
+    "dark": "/logo/mintlify.png"
   },
   "navbar": {
     "links": [

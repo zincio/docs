@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Zinc API v2",
+    "version": "2.0.0",
+    "description": "API v2 for placing orders and retrieving product data from top retailers. (Only Create Order endpoint is present in this version for demo purposes.)"
+  },
+  "servers": [
+    {
+      "url": "https://api.zinc.io",
+      "description": "Production server"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/v2/orders": {
+      "post": {
+        "summary": "Create Order (v2)",
+        "description": "Place a new order with Zinc (v2).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order created successfully (v2)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateOrderRequest": {
+        "type": "object",
+        "required": [
+          "retailer",
+          "products",
+          "shipping_address",
+          "billing_address",
+          "payment_method",
+          "retailer_credentials",
+          "max_price",
+          "shipping_method"
+        ],
+        "properties": {
+          "retailer": {
+            "type": "string",
+            "description": "The retailer code of the supported retailer."
+          },
+          "products": {
+            "type": "array",
+            "description": "A list of product objects that should be ordered.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "description": "The unique identifier for the product at the retailer."
+                },
+                "quantity": {
+                  "type": "integer",
+                  "description": "The number of units to order."
+                }
+              },
+              "required": ["product_id", "quantity"]
+            }
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/Address",
+            "description": "An address object to which the order will be delivered."
+          },
+          "shipping_method": {
+            "type": "string",
+            "description": "The desired shipping method for the object."
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/Address",
+            "description": "An address object for the person associated with the credit card."
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod",
+            "description": "A payment method object containing payment information for the order."
+          },
+          "retailer_credentials": {
+            "$ref": "#/components/schemas/RetailerCredentials",
+            "description": "A retailer credentials object for logging into the retailer with a preexisting account."
+          },
+          "is_gift": {
+            "type": "boolean",
+            "description": "Whether or not this order should be placed as a gift."
+          },
+          "gift_message": {
+            "type": "string",
+            "description": "A message to include on the packing slip for the recipient."
+          },
+          "require_gift": {
+            "type": "boolean",
+            "description": "If is_gift is true, setting require_gift to true will cause the order to fail if any items in the order do not include a gift option."
+          },
+          "shipping": {
+            "$ref": "#/components/schemas/Shipping",
+            "description": "A shipping object with information as to which shipping method to use."
+          },
+          "webhooks": {
+            "type": "object",
+            "description": "A webhooks object including URLs that will receive POST requests after particular events have finished."
+          },
+          "client_notes": {
+            "type": "object",
+            "description": "Any metadata to store on the request for future use."
+          },
+          "promo_codes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "A list of promotion codes to use at checkout."
+          },
+          "strict_expired_product_id": {
+            "type": "boolean",
+            "description": "Defaults to false. If true, fail orders where the product_id is 'expired' or 'deprecated'."
+          },
+          "po_number": {
+            "type": "number",
+            "description": "(Amazon business accounts only) Adds a purchase order number to the order."
+          },
+          "amazon_day": {
+            "type": "string",
+            "description": "(Amazon only) Specify exact name of Amazon Day shipping selection when ship_method is set to amazon_day."
+          },
+          "fail_if_taxed": {
+            "type": "boolean",
+            "description": "Defaults to false. If true, fail orders where taxes are included in the total."
+          },
+          "max_delivery_days": {
+            "type": "number",
+            "description": "(Amazon only) Defaults to unlimited. If set, fail orders with error max_delivery_days_exceeded if the retailer estimates delivery more than this many days in the future."
+          },
+          "take_buybox_offers": {
+            "type": "boolean",
+            "description": "Bypass the process of looking at all offers - takes whatever the default offer is on the item details page buy box."
+          },
+          "force_offers_postal_code": {
+            "type": "string",
+            "description": "Uses this postal code for offer selection instead of the shipping_address.zip_code value."
+          },
+          "zma_discount": {
+            "type": "number",
+            "description": "The percent below (or above, if negative) face value that you will be charged for this order."
+          },
+          "addax_queue_timeout": {
+            "type": "number",
+            "description": "Defaults to 14400. Number of seconds an order will stay in the ZMA queue before timing out."
+          },
+          "zma_prime_optout": {
+            "type": "boolean",
+            "description": "Defaults to false. Set this value to true to force your ZMA order to use a non-prime fulfillment account."
+          },
+          "zma_priority_bid": {
+            "type": "number",
+            "description": "A fixed-value bid used to prioritize ZMA orders."
+          },
+          "max_price": {
+            "type": "integer",
+            "description": "The maximum price in cents for the order."
+          }
+        }
+      },
+      "CreateOrderResponse": {
+        "type": "object",
+        "properties": {
+          "request_id": { "type": "string" }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "address_line1": { "type": "string" },
+          "address_line2": { "type": "string" },
+          "zip_code": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "country": { "type": "string" },
+          "phone_number": { "type": "string" }
+        }
+      },
+      "PaymentMethod": {
+        "type": "object",
+        "properties": {
+          "name_on_card": { "type": "string" },
+          "number": { "type": "string" },
+          "security_code": { "type": "string" },
+          "expiration_month": { "type": "integer" },
+          "expiration_year": { "type": "integer" },
+          "use_gift": { "type": "boolean" }
+        }
+      },
+      "RetailerCredentials": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "totp_2fa_key": { "type": "string" }
+        }
+      },
+      "Shipping": {
+        "type": "object",
+        "properties": {
+          "order_by": { "type": "string" },
+          "max_days": { "type": "integer" },
+          "max_price": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "securitySchemes": {
+    "basicAuth": {
+      "type": "http",
+      "scheme": "basic",
+      "description": "Use your client token as the username. Leave the password blank."
+    }
+  }
+} 

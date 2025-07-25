@@ -14,6 +14,73 @@
   "security": [{ "basicAuth": [] }],
   "paths": {
     "/v1/orders": {
+      "get": {
+        "summary": "List Orders",
+        "description": "Retrieve a list of orders within a specific timestamp range.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Maximum number of orders to return in the results (defaults to 10)"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of order responses to skip before including up to limit orders in results"
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Timestamp of start of the range (inclusive)"
+          },
+          {
+            "name": "ending_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Timestamp of end of the range (exclusive)"
+          },
+          {
+            "name": "retailer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the retailer to include orders from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of orders retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "summary": "Create Order",
         "description": "Place a new order with Zinc.",
@@ -34,6 +101,410 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{request_id}": {
+      "get": {
+        "summary": "Retrieve Order",
+        "description": "Retrieve details of a specific order by request ID.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the order request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request is currently processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessingError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{request_id}/retry": {
+      "post": {
+        "summary": "Retry Order",
+        "description": "Retry a failed order after temporary conditions are resolved.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the order request to retry"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order retry initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetryOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{request_id}/abort": {
+      "post": {
+        "summary": "Abort Order",
+        "description": "Abort an order that is still in the request_processing stage. This functionality is intended to abort an order if it was made by mistake or if it is taking too long to process.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the order request to abort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order abort response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbortOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{request_id}/cancel": {
+      "post": {
+        "summary": "Initiate Cancellation",
+        "description": "Initiate a pre-shipment order cancellation on Amazon.com and Amazon.co.uk. This occurs after an order has been successfully placed and is distinct from aborting an order.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the order request to cancel"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancellationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancellation initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancellationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cancellations/{request_id}": {
+      "get": {
+        "summary": "Retrieve Cancellation",
+        "description": "Retrieve a cancellation response given a cancellation request id.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the cancellation request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancellation details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancellationDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request is currently processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessingError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{request_id}/return": {
+      "post": {
+        "summary": "Create Return",
+        "description": "Create a return label for an order. Returns are only available on amazon and amazon_uk retailers.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The request id of the original order"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReturnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateReturnResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/returns/{request_id}": {
+      "get": {
+        "summary": "Retrieve Return",
+        "description": "Retrieve a return response given a return request id.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier for the return request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Return is currently in progress or other error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{product_id}": {
+      "get": {
+        "summary": "Get Product Details",
+        "description": "Get up to date information on the title, description, manufacturer details, item specifics, and more for any product on our supported retailers.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The retailer's unique identifier for a particular product"
+          },
+          {
+            "name": "retailer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The retailer for the product"
+          },
+          {
+            "name": "max_age",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "A number in seconds setting the maximum age of the response. Cannot specify with newer_than."
+          },
+          {
+            "name": "newer_than",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "A timestamp setting the minimum time the response should be retrieved from. Cannot specify with max_age."
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Determines whether the resulting response will be asynchronous. Defaults to false."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "get": {
+        "summary": "Product Search",
+        "description": "Search for products across supported retailers.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The search query"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The page number for pagination"
+          },
+          {
+            "name": "retailer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The retailer to search in"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{product_id}/offers": {
+      "get": {
+        "summary": "Product Offers",
+        "description": "Retrieve offers for a specific product.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The product ID"
+          },
+          {
+            "name": "retailer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The retailer for the product"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product offers retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductOffersResponse"
                 }
               }
             }
@@ -184,6 +655,229 @@
           "request_id": { "type": "string" }
         }
       },
+      "RetryOrderResponse": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The unique identifier for the new order request"
+          }
+        }
+      },
+      "AbortOrderResponse": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["error"]
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "enum": ["aborted_request", "request_processing"]
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "data": {
+            "type": "object",
+            "description": "Additional error data"
+          },
+          "request_id": {
+            "type": "string",
+            "description": "The unique identifier for the order request"
+          },
+          "request": {
+            "type": "object",
+            "description": "The original request that was sent to the Zinc API"
+          }
+        }
+      },
+      "CancellationRequest": {
+        "type": "object",
+        "properties": {
+          "merchant_order_id": {
+            "type": "string",
+            "description": "The merchant order id of the order that you would like to cancel. If the order has multiple merchant_order_ids you must cancel each separately."
+          },
+          "webhooks": {
+            "$ref": "#/components/schemas/WebhooksObject",
+            "description": "A webhooks object including URLs that will receive POST requests after request_succeeded and request_failed"
+          }
+        }
+      },
+      "CancellationResponse": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The unique identifier for the cancellation request"
+          }
+        }
+      },
+      "CancellationDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["cancellation_response"]
+          },
+          "merchant_order_id": {
+            "type": "string",
+            "description": "The merchant order id of the order that was cancelled"
+          },
+          "request": {
+            "type": "object",
+            "description": "The original request that was sent to the Zinc API"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["order_response"]
+          },
+          "price_components": {
+            "$ref": "#/components/schemas/PriceComponents"
+          },
+          "merchant_order_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MerchantOrderId"
+            },
+            "description": "A merchant order ids object which contains details about the retailer's order identifiers"
+          },
+          "tracking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tracking"
+            },
+            "description": "An array of tracking objects that contain the order's tracking information"
+          },
+          "request": {
+            "type": "object",
+            "description": "The original request that was sent to the Zinc API"
+          },
+          "delivery_dates": {
+            "type": "array",
+            "description": "An array of ordered products and their given delivery dates"
+          },
+          "account_status": {
+            "type": "array",
+            "description": "(Amazon only) An account status object that gives details about the ordering account"
+          }
+        }
+      },
+      "ProcessingError": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["error"]
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "enum": ["request_processing"]
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "data": {
+            "type": "object",
+            "description": "Additional error data"
+          }
+        }
+      },
+      "PriceComponents": {
+        "type": "object",
+        "properties": {
+          "converted_payment_total": {
+            "type": "integer",
+            "description": "Converted payment total in cents"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code"
+          },
+          "payment_currency": {
+            "type": "string",
+            "description": "Payment currency code"
+          },
+          "shipping": {
+            "type": "integer",
+            "description": "Shipping cost in cents"
+          },
+          "subtotal": {
+            "type": "integer",
+            "description": "Subtotal in cents"
+          },
+          "tax": {
+            "type": "integer",
+            "description": "Tax amount in cents"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total amount in cents"
+          }
+        }
+      },
+      "MerchantOrderId": {
+        "type": "object",
+        "properties": {
+          "merchant_order_id": {
+            "type": "string",
+            "description": "The merchant's order identifier"
+          },
+          "merchant": {
+            "type": "string",
+            "description": "The merchant name"
+          },
+          "account": {
+            "type": "string",
+            "description": "The account email"
+          },
+          "placed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the order was placed"
+          }
+        }
+      },
+      "Tracking": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "The product identifier"
+          },
+          "merchant_order_id": {
+            "type": "string",
+            "description": "The merchant's order identifier"
+          },
+          "carrier": {
+            "type": "string",
+            "description": "The shipping carrier"
+          },
+          "tracking_number": {
+            "type": "string",
+            "description": "The tracking number"
+          },
+          "obtained_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When tracking was obtained"
+          }
+        }
+      },
       "Address": {
         "type": "object",
         "properties": {
@@ -223,6 +917,494 @@
           "order_by": { "type": "string" },
           "max_days": { "type": "integer" },
           "max_price": { "type": "integer" }
+        }
+      },
+      "CreateReturnRequest": {
+        "type": "object",
+        "required": ["products", "reason_code", "method_code", "explanation"],
+        "properties": {
+          "products": {
+            "type": "array",
+            "description": "A list of product objects that should be returned",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "description": "The product ID to return"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "description": "The quantity to return"
+                }
+              }
+            }
+          },
+          "reason_code": {
+            "type": "string",
+            "description": "The reason for the return. This is passed directly to Amazon. Reason codes will vary depending on Amazon country."
+          },
+          "method_code": {
+            "type": "string",
+            "description": "The method of returning the specified products. This is passed directly to Amazon."
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Any extra information that will be passed to Amazon or the Amazon seller. It is required for some return reasons."
+          },
+          "webhooks": {
+            "type": "object",
+            "description": "A webhooks object including URLs that will receive POST requests after particular events have finished.",
+            "properties": {
+              "request_succeeded": {
+                "type": "string",
+                "description": "URL to receive success webhooks"
+              },
+              "request_failed": {
+                "type": "string",
+                "description": "URL to receive failure webhooks"
+              }
+            }
+          },
+          "cancel_pending": {
+            "type": "boolean",
+            "description": "Whether or not this request should cancel any pending returns while creating a new return. Defaults to false."
+          },
+          "return_address": {
+            "type": "object",
+            "description": "An address object from which the return is sent. If not provided, the default return address from Amazon will be used."
+          }
+        }
+      },
+      "CreateReturnResponse": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "The unique identifier for the return request"
+          }
+        }
+      },
+      "ReturnDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["return_response"]
+          },
+          "merchant_return_id": {
+            "type": "string",
+            "description": "A unique identifier for the return"
+          },
+          "return_by": {
+            "type": "string",
+            "description": "The date before which the products must be returned by"
+          },
+          "label_urls": {
+            "type": "array",
+            "description": "A list of URLs for the generated return labels",
+            "items": {
+              "type": "string"
+            }
+          },
+          "request": {
+            "type": "object",
+            "description": "The original request that was sent to the Zinc API"
+          }
+        }
+      },
+      "ReturnErrorResponse": {
+        "type": "object",
+        "properties": {
+          "_type": {
+            "type": "string",
+            "description": "Response type",
+            "enum": ["error"]
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "enum": ["return_in_progress"]
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "Status description"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Status details"
+                  }
+                }
+              },
+              "error": {
+                "type": "string",
+                "description": "Additional error information"
+              }
+            }
+          },
+          "request": {
+            "type": "object",
+            "description": "The original request that was sent to the Zinc API"
+          }
+        }
+      },
+      "ProductDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Possible values are processing, failed, or completed. You will only see processing if async: true was set on the request",
+            "enum": ["processing", "failed", "completed"]
+          },
+          "retailer": {
+            "type": "string",
+            "description": "The retailer for the product"
+          },
+          "product_id": {
+            "type": "string",
+            "description": "The retailer's unique identifier for the product"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "The timestamp that the resource was accessed"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the product"
+          },
+          "product_details": {
+            "type": "array",
+            "description": "An array of strings providing details about the product",
+            "items": {
+              "type": "string"
+            }
+          },
+          "feature_bullets": {
+            "type": "array",
+            "description": "An array of strings providing highlights of the product",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brand": {
+            "type": "string",
+            "description": "The brand of the product (if available)"
+          },
+          "main_image": {
+            "type": "string",
+            "description": "The URL of the primary image associated with the product"
+          },
+          "images": {
+            "type": "array",
+            "description": "An array of image URLs associated with the product",
+            "items": {
+              "type": "string"
+            }
+          },
+          "variant_specifics": {
+            "type": "array",
+            "description": "Array of objects containing information about the types and values of a particular product variant",
+            "items": {
+              "type": "object",
+              "properties": {
+                "dimension": {
+                  "type": "string",
+                  "description": "The type of the variant (e.g. 'Color')"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "The specific value available"
+                }
+              }
+            }
+          },
+          "all_variants": {
+            "type": "array",
+            "description": "An array of variant_specifics objects detailing all variants of the product as well as their product IDs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "variant_specifics": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "dimension": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "product_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Array of different categories that the product belongs in",
+            "items": {
+              "type": "string"
+            }
+          },
+          "authors": {
+            "type": "array",
+            "description": "Array of author names (only available for products that are books)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "product_description": {
+            "type": "string",
+            "description": "The description of the product"
+          },
+          "epids": {
+            "type": "array",
+            "description": "Array of objects containing external product identifier (epid) objects",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The name of the external product identifier"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "The identifier's value"
+                }
+              }
+            }
+          },
+          "epids_map": {
+            "type": "object",
+            "description": "An array of the epids with the epid type as the field and the epid value as the value"
+          },
+          "package_dimensions": {
+            "type": "object",
+            "description": "An object detailing the packaging details if available",
+            "properties": {
+              "weight": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                }
+              },
+              "size": {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "depth": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "length": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "item_location": {
+            "type": "string",
+            "description": "(AliExpress only) The originating location of the product"
+          },
+          "original_retail_price": {
+            "type": "number",
+            "description": "(Amazon only) The 'List Price' in cents of the product (present if the retailer is presenting a crossed out list price)"
+          },
+          "price": {
+            "type": "number",
+            "description": "(Amazon only) The price in cents of the buy box price of the item. This is not always returned and is often not the cheapest option."
+          },
+          "review_count": {
+            "type": "number",
+            "description": "(Amazon only) The number of reviews of the product"
+          },
+          "stars": {
+            "type": "number",
+            "description": "(Amazon only) The review score of the product"
+          },
+          "question_count": {
+            "type": "number",
+            "description": "(Amazon only) The number of questions on the Amazon question section"
+          },
+          "asin": {
+            "type": "string",
+            "description": "(Amazon only) The ASIN of the product"
+          },
+          "fresh": {
+            "type": "boolean",
+            "description": "(Amazon only) True if the item is an Amazon Fresh item"
+          },
+          "pantry": {
+            "type": "boolean",
+            "description": "(Amazon only) True if the item is an Amazon Pantry item"
+          },
+          "handmade": {
+            "type": "boolean",
+            "description": "(Amazon only) True if the item is an Amazon Handmade item"
+          },
+          "digital": {
+            "type": "boolean",
+            "description": "(Amazon only) True if the item is a digital-only item"
+          },
+          "buyapi_hint": {
+            "type": "boolean",
+            "description": "(Amazon only) False if the item cannot be ordered via the buyapi, True if it might be orderable"
+          },
+          "item_number": {
+            "type": "string",
+            "description": "(Costco only) The Costco item number of the product (may not contain variant details)"
+          }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "description": "Response for product search",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status of the search request"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Timestamp of the search"
+          },
+          "retailer": {
+            "type": "string",
+            "description": "The retailer searched"
+          },
+          "results": {
+            "type": "array",
+            "description": "Array of search results",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "description": "The product ID"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "The product title"
+                },
+                "image": {
+                  "type": "string",
+                  "description": "The product image URL"
+                },
+                "num_reviews": {
+                  "type": "number",
+                  "description": "Number of reviews"
+                },
+                "stars": {
+                  "type": "string",
+                  "description": "Star rating"
+                },
+                "fresh": {
+                  "type": "boolean",
+                  "description": "Whether the item is fresh"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "The product price in cents"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProductOffersResponse": {
+        "type": "object",
+        "description": "Response for product offers",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "description": "Array of offers for the product",
+            "items": {
+              "type": "object",
+              "properties": {
+                "seller": {
+                  "type": "string",
+                  "description": "The seller name"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "The offer price in cents"
+                },
+                "shipping": {
+                  "type": "number",
+                  "description": "The shipping cost in cents"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "The product condition"
+                },
+                "availability": {
+                  "type": "string",
+                  "description": "The availability status"
+                }
+              }
+            }
+          }
+        }
+      },
+      "WebhooksObject": {
+        "type": "object",
+        "description": "A webhooks object including URLs that will receive POST requests after particular events have finished",
+        "properties": {
+          "request_succeeded": {
+            "type": "string",
+            "description": "URL to receive success webhooks"
+          },
+          "request_failed": {
+            "type": "string",
+            "description": "URL to receive failure webhooks"
+          }
         }
       }
     },

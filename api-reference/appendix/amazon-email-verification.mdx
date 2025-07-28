@@ -1,0 +1,109 @@
+---
+title: "Amazon Email Verification"
+description: "How to handle Amazon email verification requirements during orders"
+icon: "envelope"
+---
+
+Occasionally, Amazon requires verification of account ownership and will email you a code during login. If this happens during an order, you will receive an `account_locked_verification_required` error.
+
+## Why This Happens
+
+Amazon may require email verification for several reasons:
+- **New account activity** from an unfamiliar location
+- **Suspicious login patterns** or multiple failed attempts
+- **Account security measures** triggered by automated ordering
+- **Policy compliance** requirements
+
+## Resolution Options
+
+### Option 1: Manual Verification Code
+
+Check the email associated with your Amazon account and obtain the verification code. Then resubmit your order and supply the code as `verification_code` under the `retailer_credentials` object.
+
+```json
+{
+  "retailer_credentials": {
+    "email": "your-email@example.com",
+    "password": "your-password",
+    "verification_code": "123456"
+  }
+}
+```
+
+### Option 2: Two-Factor Authentication
+
+Enable Two-Factor Authentication (2FA) on your Amazon account and supply the `totp_2fa_key` with every order under the `retailer_credentials` object.
+
+<Info>
+  Using 2FA is the most secure and reliable method for avoiding verification issues.
+</Info>
+
+```json
+{
+  "retailer_credentials": {
+    "email": "your-email@example.com",
+    "password": "your-password",
+    "totp_2fa_key": "JBSWY3DPEHPK3PXP"
+  }
+}
+```
+
+### Option 3: Zinc Managed Accounts
+
+Use **Zinc Managed Accounts** where we manage keeping accounts open and unlocked. This eliminates the need for manual verification and provides the highest reliability for automated ordering.
+
+<Card title="Learn More" icon="shield" href="/guides/managed-accounts">
+  Discover how Zinc Managed Accounts can simplify your automation workflow.
+</Card>
+
+### Option 4: Email Forwarding
+
+Forward all emails from your Amazon account's email to `email@quail.zinc.io`. AutoOrdering will automatically parse the incoming email and fill in the verification code.
+
+<Alert type="info">
+  For instructions on how to forward emails from a Gmail account, see our <a href="/guides/email-forwarding" target="_blank">Email Forwarding Guide</a>.
+</Alert>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use 2FA" icon="shield">
+    Enable Two-Factor Authentication for the most reliable experience
+  </Card>
+  <Card title="Monitor Emails" icon="envelope">
+    Check your email regularly for verification requests
+  </Card>
+  <Card title="Consider Managed Accounts" icon="user-check">
+    For high-volume automation, use Zinc Managed Accounts
+  </Card>
+  <Card title="Contact Support" icon="headset">
+    Reach out if you need help with verification issues
+  </Card>
+</CardGroup>
+
+## Error Response
+
+When verification is required, you'll receive an error response like this:
+
+```json
+{
+  "_type": "error",
+  "code": "account_locked_verification_required",
+  "message": "Amazon requires email verification. Please provide verification_code in retailer_credentials.",
+  "data": {
+    "retailer": "amazon",
+    "account_email": "your-email@example.com"
+  }
+}
+```
+
+## Need Help?
+
+If you're experiencing persistent verification issues or need assistance setting up any of these solutions, contact our support team at [support@zinc.io](mailto:support@zinc.io).
+
+---
+
+**Related Topics:**
+- [Authentication](/api-reference/introduction/authentication)
+- [Error Handling](/api-reference/introduction/error-handling)
+- [Creating Orders](/api-reference/orders/create) 

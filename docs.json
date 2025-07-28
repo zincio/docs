@@ -36,7 +36,6 @@
                   "api-reference/introduction/authentication",
                   "api-reference/introduction/idempotency",
                   "api-reference/introduction/error-handling",
-                  "api-reference/introduction/rate-limits",
                   "api-reference/introduction/webhooks",
                   "api-reference/introduction/accounts-payments"
                 ]
@@ -67,6 +66,15 @@
                   "api-reference/products/offers",
                   "api-reference/products/search"
                 ]
+              },
+              {
+                "group": "Appendix",
+                "pages": [
+                  "api-reference/appendix/amazon-email-verification",
+                  "api-reference/appendix/amazon-blank-offers",
+                  "api-reference/appendix/proxies",
+                  "api-reference/appendix/faq"
+                ]
               }
             ]
           }
@@ -96,7 +104,6 @@
                   "api-reference/introduction/authentication",
                   "api-reference/introduction/idempotency",
                   "api-reference/introduction/error-handling",
-                  "api-reference/introduction/rate-limits",
                   "api-reference/introduction/webhooks",
                   "api-reference/introduction/accounts-payments"
                 ]

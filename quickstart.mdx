@@ -4,17 +4,15 @@ description: "Get started with Zinc API in minutes."
 icon: "rocket"
 ---
 
-This quickstart will help you make your first API call in just a few minutes.
+## 1. Create your Zinc account
 
-<Alert type="info">
-  You'll need a Zinc account. <a href="https://dash.zinc.io/signup" target="_blank">Sign up here</a> if you haven't already.
-</Alert>
+<a href="https://dash.zinc.io/signup" target="_blank">Sign up here</a> to get started. You will need to deposit funds into your Zinc account to use the API.
 
-## 1. Get Your API Credentials
+## 2. Get Your API Credentials
 
 After signing up, visit your <a href="https://dash.zinc.io" target="_blank">Zinc dashboard</a> to find your client token.
 
-## 2. Make Your First API Call
+## 3. Make Your First API Call
 
 Here's how to fetch product details from Amazon using `curl`:
 
@@ -23,22 +21,11 @@ curl 'https://api.zinc.io/v1/search?query=fish%20oil&page=1&retailer=amazon' \
   -u <client_token>:
 ```
 
-<Note>
+<Info>
 Replace <code>&lt;client_token&gt;</code> with your actual token. Never share your client token publicly.
-</Note>
+</Info>
 
 If successful, you'll get a JSON response with product information (title, price, images, etc.).
-
-## 3. Explore More
-
-<CardGroup cols={2}>
-  <Card title="API Reference" icon="book" href="/api-reference/introduction/authentication">
-    See all endpoints, request/response formats, and integration details.
-  </Card>
-  <Card title="Examples" icon="code" href="/guides/examples">
-    See real-world use cases and code samples for common workflows.
-  </Card>
-</CardGroup>
 
 ---
 

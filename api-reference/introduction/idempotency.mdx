@@ -1,10 +1,21 @@
 ---
 title: "Idempotency"
-description: "Ensure safe retries and avoid duplicate operations with idempotency keys."
+description: "Ensure safe retries and avoid duplicate operations with idempotency keys"
 icon: "repeat-1"
 ---
 
 Idempotency keys let you safely retry requests without accidentally performing the same operation twice.
+
+
+By default, the Zinc API will attempt to place a new order every time you send a request.  
+However, if you include an `idempotency_key` in your POST request body, Zinc will guarantee that only a single order is created for that key — even if you retry the request due to a network error or timeout.
+
+- **How to use:**  
+  - Add a unique `"idempotency_key"` (such as a UUID or random string) to the body of any POST request
+- **Behavior:**  
+  - Requests with the same key will always return the same response
+  - If you receive an error, you can retry with a new key
+  - Once a request succeeds or fails, the order will not change for that key
 
 ## Example Idempotency Key Request
 
@@ -19,17 +30,7 @@ curl "https://api.zinc.io/v1/orders" \
   }'
 ```
 
-By default, the Zinc API will attempt to place a new order every time you send a request.  
-However, if you include an `idempotency_key` in your POST request body, Zinc will guarantee that only a single order is created for that key—even if you retry the request due to a network error or timeout.
-
-- **How to use:**  
-  - Add a unique `"idempotency_key"` (such as a UUID or random string) to the body of any POST request.
-- **Behavior:**  
-  - Requests with the same key will always return the same response.
-  - If you receive an error, you can retry with a new key.
-  - Once a request succeeds or fails, the order will not change for that key.
-
 <Warning>
-Idempotency keys are strongly recommended for all POST requests.  
+<b>Idempotency keys are strongly recommended for all POST requests</b>  
 If you retry a request after a 5XX error <b>without</b> an idempotency key, Zinc cannot guarantee deduplication and will not refund duplicate orders.
 </Warning> 

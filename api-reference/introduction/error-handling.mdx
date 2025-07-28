@@ -1,6 +1,6 @@
 ---
 title: "Error Handling"
-description: "Understand error responses and how to handle them."
+description: "Understand error responses and how to handle them"
 icon: "triangle-exclamation"
 ---
 
@@ -22,15 +22,15 @@ Every error object contains:
 - **message**: A human-readable message for developers (not end users).
 - **data**: Additional information about the error (e.g., product ID, max quantity, etc.).
 
-## Common Error Codes
+## Zinc Error Codes
 
 | Error Code                          | Meaning                                                                                   |
 |:------------------------------------|:-------------------------------------------------------------------------------------------|
 |`account_locked`                      | The retailer asked for additional information to verify your account.                      |
-|`account_locked_verification_required`| The retailer emailed you a code which you must supply to continue ordering.                |
-|`account_login_failed`                | Unable to log in to the retailer with the provided username and password.                  |
+|`account_locked_verification_required`| The retailer emailed you a code which you must supply to continue ordering. <a href="/api-reference/appendix/amazon-email-verification">More Info</a> |
+|`account_login_failed`                | We were unable to log in to the retailer with the provided username and password.                  |
 |`add_on_item`                         | Add-on items cannot be ordered individually.                                               |
-|`additional_information_required`     | Retailer asked for additional account verification questions.                              |
+|`additional_information_required`     | Retailer asked for additional account verification questions. If using the API, please add a field `phone_number` in the billing address that matches your billing telephone number.|
 |`billing_address_refused`             | The billing address you provided was refused by the retailer.                              |
 |`brand_not_accepted`                  | Your credit card brand is not accepted with this merchant.                                 |
 |`cannot_schedule_delivery`            | Item requires scheduled delivery options that Zinc does not support.                       |
@@ -41,7 +41,7 @@ Every error object contains:
 |`insufficient_zma_balance`            | Insufficient funds in your Managed Account Balance to complete the order.                  |
 |`insufficient_variants`               | You did not select all required variants for a product.                                    |
 |`internal_error`                      | Zinc or the retailer is experiencing outages. Try again or contact support if it persists. |
-|`invalid_address`                     | The provided address was incomplete or could not be parsed.                                |
+|`invalid_address`                     | The provided address was incomplete or could not be parsed. Try providing an address in canonical Zinc format rather than free-form text.|
 |`invalid_card_number`                 | The credit card number you entered is not valid.                                          |
 |`invalid_client_token`                | Your client token is invalid.                                                             |
 |`invalid_expiration_date`             | The expiration date on your credit card is not valid.                                     |
@@ -57,27 +57,27 @@ Every error object contains:
 |`invalid_shipping_method`             | The shipping method you selected was not valid.                                           |
 |`invalid_variant`                     | One of the product variants you provided was not valid.                                   |
 |`item_not_supported`                  | The item is not supported via the buyapi (likely a digital or handmade item).             |
-|`manual_review_required`              | This order is under manual review by Zinc.                                                |
+|`manual_review_required`              | This order is under manual review by Zinc. please check back later for the status of this order.|
 |`max_price_exceeded`                  | The retailer's final price exceeds the maximum price.                                     |
 |`max_quantity_exceeded`               | You have exceeded the maximum quantity available for a specific product.                  |
-|`max_delivery_days_exceeded`          | The retailer's estimated delivery date exceeds the max_delivery_days parameter.           |
-|`mismatching_retailer`                | Product URLs were provided for multiple retailers, or the explicit retailer did not match. |
+|`max_delivery_days_exceeded`          | The retailer's estimated delivery date exceeds the `max_delivery_days` parameter.           |
+|`mismatching_retailer`                | Product URLs were provided for multiple retailers, or an explicit retailer was provided, but it did not match the provided URLs. Try again using only products from a single retailer.|
 |`no_free_shipping`                    | Free shipping is not available for the item(s) you selected.                              |
 |`no_gift_shipping`                    | No gift shipping was available on this order.                                             |
 |`no_two_day_shipping`                 | Two day shipping (or faster) is not available for the item(s) you selected.               |
-|`order_probably_placed`               | Order was probably placed, but merchant order IDs could not be retrieved.                 |
+|`order_probably_placed`               | Order likely placed, but order IDs couldn't be retrieved. Check the retailer site; if placed, cancel before retrying.|
 |`payment_info_problem`                | There was a problem with your payment information.                                        |
 |`prime_pantry_not_supported`          | Purchasing Prime Pantry items is not supported by the Zinc API.                           |
-|`product_unavailable`                 | One of the products you selected is not available on the retailer.                        |
+|`product_unavailable`                 | One of the products you selected is not available on the retailer. Either seller selection criteria did not match any available offers or the product is out of stock.|
 |`request_processing`                  | Request is currently processing and will complete soon.                                   |
 |`shipping_address_refused`            | The shipping address you provided was refused by the retailer.                            |
 |`shipping_address_unavailable`        | The item(s) cannot be shipped to the selected shipping address.                           |
-|`shipping_method_unavailable`         | The selected shipping_method is not available for the selected shipping_address.           |
-|`unauthorized_access`                 | You are not authorized to make this API call.                                             |
-|`unknown_retailer`                    | The provided product URLs did not correspond to a known supported retailer.               |
-|`unsupported_product_id`              | The item product_id is not specific enough.                                               |
-|`zma_temporarily_overloaded`          | The ZMA system was unable to place your order within 4 hours.                             |
+|`shipping_method_unavailable`         | The selected shipping_method is not available for the selected `shipping_address`.           |
+|`unauthorized_access`                 | You are not authorized to make this API call. Please contact support@zinc.io.                                           |
+|`unknown_retailer`                    | The provided product URLs did not correspond to a known <a href="/supported-retailers">supported retailer</a>.               |
+|`unsupported_product_id`              | The item product_id is not specific enough. Choose a specific product_id to order.|
+|`zma_temporarily_overloaded`          | The ZMA system was unable to place your order within 4 hours.Try again later, or check your parameters.|
 
 <Info>
-For a full list of error codes and troubleshooting help, contact <a href="mailto:support@zinc.io">support@zinc.io</a>.
+If you are still having issues, contact <a href="mailto:support@zinc.io">support@zinc.io</a>.
 </Info> 

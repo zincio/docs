@@ -77,6 +77,29 @@
                 ]
               }
             ]
+          },
+          {
+            "tab": "Object Reference",
+            "groups": [
+              {
+                "group": "Objects",
+                "pages": [
+                  "object-reference/product",
+                  "object-reference/seller-selection-criteria",
+                  "object-reference/shipping",
+                  "object-reference/address",
+                  "object-reference/payment-method",
+                  "object-reference/webhooks",
+                  "object-reference/retailer-credentials",
+                  "object-reference/promo-code",
+                  "object-reference/price-components",
+                  "object-reference/merchant-order-ids",
+                  "object-reference/account-status",
+                  "object-reference/product-offer",
+                  "object-reference/tracking"
+                ]
+              }
+            ]
           }
         ]
       },

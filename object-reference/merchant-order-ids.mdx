@@ -1,0 +1,31 @@
+---
+title: "Merchant Order IDs"
+description: "Merchant order IDs object structure and attributes"
+icon: "receipt"
+---
+
+## Merchant Order IDs Object
+
+```json Example Merchant Order IDs Object
+{
+  "merchant_order_id": "112-1234567-7272727",
+  "merchant": "amazon",
+  "account": "timbeaver@gmail.com",
+  "placed_at": "2018-01-02T23:51:08.366Z",
+  "tracking_url": "https://www.amazon.com/progress-tracker/package/ref=oh_aui_hz_st_btn?_encoding=UTF8&itemId=jnlnooqppopuun&orderId=112-1234567-7272727",
+  "delivery_date": "Jan. 7, 2018"
+}
+```
+
+## Attributes
+
+| Attribute | Type | Description |
+|:----------|:-----|:------------|
+| `merchant_order_id` | String | The identifier provided by the retailer for the order that was placed |
+| `merchant` | String | The retailer on which the order was placed |
+| `account` | String | The account on which the order was placed |
+| `placed_at` | Date | The date and time at which the order was placed |
+| `tracking` | Array | A list of the tracking numbers associated with the order |
+| `product_ids` | Array | A list of product_ids in the order |
+| `tracking_url` | String | The tracking url provided by the merchant (if available) |
+| `delivery_date` | String | The projected delivery date given by the retailer | dd

@@ -1,0 +1,36 @@
+---
+title: "Payment Method"
+description: "Payment method object structure and attributes"
+icon: "credit-card"
+---
+
+## Payment Method Object
+
+```json Example Payment Object
+{
+  "name_on_card": "Ben Bitdiddle",
+  "number": "5555555555554444",
+  "security_code": "123",
+  "expiration_month": 1,
+  "expiration_year": 2015,
+  "use_gift": false
+}
+```
+
+The recommended way to pay for purchases on a retailer is by using gift card balance already applied to an account. Gift cards are supported on amazon, amazon_uk, amazon_ca, and walmart. To use the existing gift balance on the account, simply pass `{"use_gift": true}` as the payment method object.
+
+To use a credit card, you must include the `name_on_card`, `number`, `security_code`, `expiration_month`, and `expiration_year` fields. For Amazon, you should only have a single credit card associated with an account which should be the same as the card passed in the payment method object. This allows the system to correctly answer any payment-related security questions.
+
+## Attributes
+
+| Attribute | Type | Description |
+|:----------|:-----|:------------|
+| `name_on_card` | String | The full name on the credit/debit card |
+| `number` | String | The credit/debit card number |
+| `security_code` | String | The card verification value on the back of the credit/debit card |
+| `expiration_month` | Number | The month of the expiration of the card (e.g. January is 1, February is 2) |
+| `expiration_year` | Number | The year of the expiration of the card (e.g. 2016) |
+| `use_gift` | Boolean | Whether or not to use the gift balance on the retailer account. If true, then the gift balance will be used for payment. Only works for retailers which support gift balance (Amazon and Walmart). |
+| `use_account_payment_defaults` | Boolean | Overrides all other payment_method options and uses the default payment configuration on the account. Only applies to Amazon orders. |
+| `is_virtual_card` | Boolean | Whether or not to check the "Virtual or one-time-use" checkbox when adding the card. Only applies to Amazon orders. |
+| `reuse` | Boolean | If true, will skip entering credit card if it is already present and we aren't prompted for it. Only applies to Amazon orders. | 

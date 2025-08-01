@@ -1,0 +1,37 @@
+---
+title: "Address"
+description: "Address object structure and attributes"
+icon: "location-dot"
+---
+
+## Address Object
+
+```json Example Address Object
+{
+  "first_name": "Tim",
+  "last_name": "Beaver",
+  "address_line1": "77 Massachusetts Avenue",
+  "address_line2": "",
+  "zip_code": "02139",
+  "city": "Cambridge",
+  "state": "MA",
+  "country": "US",
+  "phone_number": "5551230101",
+  "instructions": "Place packages inside blue garage door."
+}
+```
+
+## Attributes
+
+| Attribute | Type | Description |
+|:----------|:-----|:------------|
+| `first_name` | String | The first name of the addressee |
+| `last_name` | String | The last name of the addressee |
+| `address_line1` | String | The house number and street name |
+| `address_line2` | String | The suite, post office box, or apartment number (optional) |
+| `zip_code` | String | The zip code of the address |
+| `city` | String | The city of the address |
+| `state` | String | The USPS abbreviation for the state of the address (e.g. AK) |
+| `country` | String | The ISO abbreviation for the country of the address (e.g. US). A list of all available two-letter country codes can be found [here](https://www.theodora.com/country_digraphs.html). |
+| `phone_number` | String | The phone number associated with the address |
+| `instructions` | String | Optional instructions to include with the shipping addresses | 

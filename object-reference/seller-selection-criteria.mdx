@@ -1,0 +1,41 @@
+---
+title: "Seller Selection Criteria"
+description: "Seller selection criteria object structure and attributes"
+icon: "filter"
+---
+
+## Seller Selection Criteria Object
+
+```json Example Seller Selection Criteria Object
+{
+  "addon": false,
+  "condition_in": ["New"],
+  "handling_days_max": 6,
+  "max_item_price": 5350,
+  "min_seller_num_ratings": 100,
+  "prime": true
+}
+```
+
+Seller selection criteria allow you to filter multiple offers for a product from a retailer. They give you fine grained control when a retailer has multiple offers for a single product. This happens frequently when third party or affiliated merchants are selling on a platform, such as on Amazon.
+
+The seller selection criteria serve as a series of optional filters to narrow down the potential set of offers to something reasonable. After all the filters have been applied, Zinc will select the cheapest offer that is still available. For example, if `"handling_days_max": 6` is applied, then the Zinc API will order the cheapest offer where the shipping will arrive in 6 days or less.
+
+## Attributes
+
+| Attribute | Type | Description |
+|:----------|:-----|:------------|
+| `addon` | Boolean | (Amazon only) Specifies whether the selected offer should be an addon item |
+| `buy_box` | Boolean | (Amazon only) Specifies whether the selected offer should be Amazon's default buy box offer |
+| `condition_in` | Array | An array of item conditions that the Zinc API must order from |
+| `condition_not_in` | Array | An array of item conditions that the Zinc API must not order from |
+| `first_party_seller` | Boolean | Is the seller first-party? e.g. sold by Walmart.com on walmart |
+| `handling_days_max` | Number | The maximum number of allowable days for shipping and handling |
+| `international` | Boolean | Specifies whether the item should come from an international supplier |
+| `max_item_price` | Number | The maximum allowable price in cents for an item |
+| `merchant_id_in` | Array | (Amazon only) An array of merchant ids that the Zinc API must order from |
+| `merchant_id_not_in` | Array | (Amazon only) An array of merchant ids that the Zinc API must not order from |
+| `min_seller_num_ratings` | Number | (Amazon only) The minimum number of ratings required for an Amazon seller's offer to be selected |
+| `min_seller_percent_positive_feedback` | Number | (Amazon only) The minimum percentage of positive ratings of an Amazon seller for their offer to be selected |
+| `prime` | Boolean | (Amazon only) Specifies whether the selected offer should be an Amazon Prime offer |
+| `allow_oos` | Boolean | (Amazon only) Specifies whether we should still attempt to complete ordering with the cheapest offer if all offers appear unavailable | 

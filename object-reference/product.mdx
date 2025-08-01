@@ -1,0 +1,27 @@
+---
+title: "Product"
+description: "Product object structure and attributes"
+icon: "box"
+---
+
+## Product Object
+
+```json Example Product Object
+{
+  "product_id": "B06XGHJ5H3",
+  "quantity": 1,
+  "seller_selection_criteria": {
+    "prime": true,
+    "handling_days_max": 6,
+    "condition_in": ["New"]
+  }
+}
+```
+
+## Attributes
+
+| Attribute | Type | Required | Description |
+|:----------|:-----|:---------|:------------|
+| `product_id` | String | Yes | The retailer's unique identifier for the product. Note that Zinc does not support digital purchases or Amazon prime pantry items. |
+| `quantity` | Number | Yes | The number of products to purchase. |
+| `seller_selection_criteria` | Object | No | A seller selection criteria object containing information about which offers to choose when there are multiple offers available. If the seller selection criteria object is not included for a product, the seller selection criteria will default to `"prime": true`, `"handling_days_max": 6`, and `"condition_in": ["New"]`. | 

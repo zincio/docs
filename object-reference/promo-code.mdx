@@ -1,0 +1,27 @@
+---
+title: "Promo Code"
+description: "Promo code object structure and attributes"
+icon: "tags"
+---
+
+## Promo Code Object
+
+```json Example Promo Code Object
+{
+  "code": "FIVEBUCKSOFF",
+  "optional": false,
+  "merchant_id": "A3GH440E2AFGH4",
+  "discount_amount": 500
+}
+```
+
+## Attributes
+
+| Attribute | Type | Description |
+|:----------|:-----|:------------|
+| `code` | String | The promo code to apply (required) |
+| `optional` | Boolean | (Optional) Should we continue placing the order if this code fails to apply? Defaults to false. |
+| `merchant_id` | String | (Optional) If supplied, only try this code if we selected an offer from the given merchant. |
+| `discount_amount` | Number | (Optional) Fixed amount in cents by which we should discount the matching merchant's offers during offer selection. Only makes sense if `merchant_id` is also supplied. Defaults to 0. |
+| `discount_percentage` | Number | (Optional) Percentage amount (between 0 and 100) by which we should discount the matching merchant's offers during offer selection. Only makes sense if `merchant_id` is also supplied. Defaults to 0. |
+| `cost_override` | Number | (Optional) If supplied, we will assume all offers by this merchant cost exactly this many cents. Only makes sense if `merchant_id` is also supplied. Overrides other discount methods. | 

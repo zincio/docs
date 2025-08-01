@@ -4,16 +4,16 @@ description: "Get started with Zinc API in minutes."
 icon: "rocket"
 ---
 
-## 1. Create your Zinc account
-
+<Steps>
+<Step title="Create your Zinc account" stepNumber={1}>
 <a href="https://dash.zinc.io/signup" target="_blank">Sign up here</a> to get started. You will need to deposit funds into your Zinc account to use the API.
+</Step>
 
-## 2. Get Your API Credentials
-
+<Step title="Get Your API Credentials" stepNumber={2}>
 After signing up, visit your <a href="https://dash.zinc.io" target="_blank">Zinc dashboard</a> to find your client token.
+</Step>
 
-## 3. Make Your First API Call
-
+<Step title="Make Your First API Call" stepNumber={3}>
 Here's how to fetch product details from Amazon using `curl`:
 
 ```bash
@@ -26,6 +26,8 @@ Replace <code>&lt;client_token&gt;</code> with your actual token. Never share yo
 </Info>
 
 If successful, you'll get a JSON response with product information (title, price, images, etc.).
+</Step>
+</Steps>
 
 ---
 

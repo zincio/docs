@@ -1,5 +1,13 @@
 ---
 title: "Create Cancellation"
-description: "Endpoint to initiate a cancellation for an order."
+description: "Initiate a cancellation for an order"
 openapi: 'POST /v1/orders/{request_id}/cancel'
---- 
+---
+
+The Zinc API supports pre-shipment order cancellation on Amazon.com and Amazon.co.uk.
+
+<Note>
+You can only cancel an order after it has been successfully placed using the API
+</Note>
+
+This is distinct from [aborting an order](/api-reference/orders/abort), which occurs while the order is still in progress. Cancellations will send a cancellation request to the retailer and attempt to stop the order from shipping and can only be initiated for order requests that were successful.

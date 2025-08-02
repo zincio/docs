@@ -1,0 +1,39 @@
+---
+title: "Retrieve Case"
+description: "Get the status and history of a case"
+openapi: 'GET /v1/orders/{order_id}/case'
+---
+
+Check the status of a case for a Managed Account order. Cases are automatically opened when orders are cancelled, returns are requested, or other issues occur.
+
+## Case States
+
+| State | Description |
+|:------|:------------|
+| `null` | No case has been opened for this order |
+| `open` | A case has been opened for this order |
+| `closed` | A case has been closed for this order |
+
+## Message Types
+
+The `messages` array contains the entire case history with these possible types:
+
+| Message Type | Description |
+|:-------------|:------------|
+| `case.opened.return.request_label` | A case has been opened for a return label |
+| `case.opened.nondelivery.not_delivered` | A case has been opened for a non-delivery issue |
+| `case.opened.nondelivery.damaged` | A case has been opened for a damaged package |
+| `case.opened.nondelivery.empty_box` | A case has been opened for an empty box |
+| `case.opened.tracking.request_update` | A case has been opened requesting an update on an order status |
+| `case.opened.cancel.forced_cancellation` | A case has been opened for an order force cancelled by the source |
+| `case.opened.other` | A catch-all category for a case |
+| `case.freetext` | A generic, free text case response |
+| `case.return.label_generated` | A return label has been generated |
+| `case.return.status_updated` | The case status has been updated |
+| `case.refund.partial` | The case has resulted in a partial refund being issued |
+| `case.refund.full` | The case has resulted in a full refund being issued |
+| `case.closed` | The case has been closed |
+
+<Info>
+The most up-to-date case status is represented by the latest object in the `messages` list.
+</Info> 

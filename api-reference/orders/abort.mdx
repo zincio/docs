@@ -1,5 +1,12 @@
 ---
 title: "Abort Order"
-description: "Endpoint to abort an order in progress."
+description: "Abort an order in progress"
 openapi: 'POST /v1/orders/{request_id}/abort'
 --- 
+
+The Zinc API allows you to abort orders that are still in the `request_processing` stage. This functionality is intended to abort an order if was made by mistake or if it is taking too long to process.
+
+The response will be the same as if you were to [GET the order](/api-reference/orders/retrieve). If we were able to immediately abort the order, the order will have an error code of `aborted_request`.
+
+It can take time for an order to abort and success is not guaranteed. You can either periodically poll the order to check if it was aborted or use webhooks.
+

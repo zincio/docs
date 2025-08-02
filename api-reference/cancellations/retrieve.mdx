@@ -1,5 +1,48 @@
 ---
 title: "Retrieve Cancellation"
-description: "Endpoint to retrieve the status of a cancellation."
+description: "Retrieve the status of a cancellation"
 openapi: 'GET /v1/cancellations/{request_id}'
---- 
+---
+
+You will receive either a `request_processing` response, an error response, or a successful cancellation response of type `cancellation_response`.
+
+## Attempting to Cancel State
+
+In approximately 50% of cases, Amazon cannot immediately cancel an order and will respond with an "attempting to cancel" status:
+
+```json Example attempting_to_cancel Response
+{
+  "_type": "error",
+  "code": "attempting_to_cancel",
+  "message": "The retailer is attempting to cancel the order.",
+  "data": {
+    "msg": "Attempting to cancel order"
+  },
+  "request": {
+    ...
+  }
+}
+```
+
+<Info>
+**Processing Time:** When a cancellation enters the `attempting_to_cancel` state, Zinc will continue polling the retailer to determine the final status. No guarantees can be made for how long this will take.
+</Info>
+
+### State Transitions
+
+The `attempting_to_cancel` state is temporary and will eventually resolve to one of:
+- **Successful cancellation** - Order was cancelled successfully
+- **Failed cancellation** - Cancellation was rejected or failed
+
+### Webhook Behavior
+
+If you're using webhooks, you'll receive notifications for state changes:
+
+1. **Initial `attempting_to_cancel`** - `request_failed` webhook is triggered
+2. **Final resolution:**
+   - If cancellation succeeds → `request_succeeded` webhook
+   - If cancellation fails → `request_failed` webhook (again with updated response)
+
+<Tip>
+Using webhooks eliminates the need to poll the cancellation request ID for status updates.
+</Tip>

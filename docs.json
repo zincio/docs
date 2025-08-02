@@ -60,6 +60,14 @@
                 ]
               },
               {
+                "group": "Cases",
+                "pages": [
+                  "api-reference/cases/create",
+                  "api-reference/cases/retrieve",
+                  "api-reference/cases/update"
+                ]
+              },
+              {
                 "group": "Product Data",
                 "pages": [
                   "api-reference/products/details",
@@ -144,8 +152,9 @@
     ]
   },
   "logo": {
-    "light": "/logo/mintlify.png",
-    "dark": "/logo/mintlify.png"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png",
+    "href": "https://zinc.com"
   },
   "navbar": {
     "links": [

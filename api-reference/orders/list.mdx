@@ -1,5 +1,11 @@
 ---
 title: "List Orders"
-description: "Endpoint to list all orders."
+description: "Get a list of all orders in your account"
 openapi: 'GET /v1/orders'
 --- 
+
+To get a list of all orders within a specific timestamp range, use the order query and include these additional query parameters.
+
+The timestamps are unix timestamps in milliseconds, which you can read about [here](https://en.wikipedia.org/wiki/Unix_time). To easily convert a human-readable date / time to a unix timestamp, you can use this [converter](https://www.epochconverter.com/).
+
+Sample code that includes an example of a bulk order query can be found in this [GitHub repo](https://github.com/zincio/api-samples).

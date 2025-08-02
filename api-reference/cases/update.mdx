@@ -1,0 +1,19 @@
+---
+title: "Update Case"
+description: "Add a message to an existing case"
+openapi: 'POST /v1/orders/{order_id}/case'
+---
+
+<Info>
+Cases are for **Zinc Managed Account (ZMA) orders only**. Self-managed account orders should handle issues directly with the retailer.
+</Info>
+
+Add a message to an existing case to provide updates or additional information.
+
+<Warning>
+Do not include the `reason` field when updating a case - send only the `message`.
+</Warning>
+
+<Tip>
+Check the case status regularly using the [Retrieve Case](/api-reference/cases/retrieve) endpoint for updates from Zinc support.
+</Tip> 

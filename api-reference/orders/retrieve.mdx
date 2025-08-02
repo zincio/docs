@@ -1,5 +1,20 @@
 ---
 title: "Retrieve Order"
-description: "Endpoint to retrieve an existing order."
+description: "Get the status of an order from the order request_id"
 openapi: 'GET /v1/orders/{request_id}'
 --- 
+
+Check order status using the `request_id` from your order request.
+
+<Info>
+**Processing Time:** Orders typically take time to process. During processing, you'll receive `request_processing` responses.
+</Info>
+
+**Possible responses:**
+- **Success:** Order details with merchant order IDs, tracking, and pricing
+- **Processing:** Error response with `request_processing` code  
+- **Failed:** Error response with specific error code
+
+<Tip>
+See [Error Handling](/api-reference/introduction/error-handling) for complete error code reference.
+</Tip>

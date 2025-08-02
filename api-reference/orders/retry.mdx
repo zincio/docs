@@ -1,5 +1,9 @@
 ---
 title: "Retry Order"
-description: "Endpoint to retry a failed order."
+description: "Retry a failed order"
 openapi: 'POST /v1/orders/{request_id}/retry'
 --- 
+
+Sometimes an order will fail for reasons that are temporary. In these situations, orders can be retried after the temporary conditions are resolved.
+
+A successful order retry response contains the `request_id` of the new order.

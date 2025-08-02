@@ -12,7 +12,7 @@ To use webhooks, include a `webhooks` object in your API request. This object sp
 The `webhooks` object in your request, specifying which events you want to receive and where.
 
 **What you receive:**  
-When an event occurs, Zinc sends a `POST` request to your specified URL(s). The body of the webhook is the same as the standard JSON response for that event (see [Object Reference](/api-reference/objects/order), etc.).
+When an event occurs, Zinc sends a `POST` request to your specified URL(s). The body of the webhook is the same as the standard JSON response for that event (see [Webhooks Reference](/object-reference/webhooks), etc.).
 
 ## Example Webhooks Object
 
@@ -40,15 +40,10 @@ When an event occurs, Zinc sends a `POST` request to your specified URL(s). The 
 | `status_updated`      | `String` | Webhook URL for when the status of a request is updated                                       |
 | `case_updated`        | `String` | Webhook URL for when a ZMA case associated with the order receives an update                  |
 
-<Note>
-The <code>case_updated</code> webhook is specifically for ZMA order cases.
-</Note>
-
-- You can pass an **array of URLs** for any webhook type; Zinc will notify all of them.
+- You can optionallypass an **array of URLs** for any webhook type; Zinc will notify all of them.
 - Webhooks have **"at least once" delivery**—your endpoint may receive the same event more than once. Deduplicate on your end if needed.
-- Webhooks are **not signed**. For security, you can:
-  - Include a secret query parameter or HTTP basic auth in your webhook URL (e.g., `https://user:password@example.com/zinc/tracking_obtained`)
-  - Use the webhook as a trigger and re-fetch the event data from the API for verification.
+- Webhooks are **not signed**. For security, you can include a secret query parameter or HTTP basic auth in your webhook URL: `https://user:password@example.com/zinc/tracking_obtained`
+- Additionally, for maximum security, you can discard the body of the webhook and instead use it as a trigger to re-fetch the body from the normal `/v1/orders/:order_id` API endpoint.
 
 <Info>
 If no URL is specified for a webhook type, no notification will be sent for that event.

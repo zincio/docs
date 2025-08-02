@@ -1,0 +1,13 @@
+---
+title: "Create Case"
+description: "Open a new case on your Zinc Managed Account (ZMA) order"
+openapi: 'POST /v1/orders/{order_id}/case'
+---
+
+<Info>
+Cases are for **Zinc Managed Account (ZMA) orders only**. Self-managed account orders should handle issues directly with the retailer.
+</Info> 
+
+In some cases, a Managed Account order might initially succeed (and thus charge your account) but later need to be reversed. For example, your buyer might want to return the product, or the order may be cancelled by the Amazon seller.
+
+Cases are automatically opened by Zinc when an order is cancelled, a return is requested, and for other scenarios. You can also open a Case to ask for assistance with a failed return, cancellation, and other issues. Cases are regularly updated by Zinc with information about the status of the case.

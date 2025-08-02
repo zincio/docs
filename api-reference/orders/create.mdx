@@ -1,9 +1,94 @@
 ---
 title: "Create Order"
-description: "Endpoint to create a new order via the Zinc API."
+description: "Create a new order via the Zinc API"
 openapi: 'POST /v1/orders'
 ---
 
-## Order Status Flow
+Zinc offers two ways to place orders depending on your business needs. Choose the approach that works best for you:
 
-<img src="/images/orders.png" alt="Order Status Flow" />
+<Tabs>
+    <Tab title="Self-Managed Account">
+        Use your own Amazon, Walmart, or other retailer account credentials. You have full control over orders and can use your preferred payment methods.
+
+        **Required fields:**
+        - `retailer` - The retailer code of the [supported retailer](/supported-retailers)
+        - `products` - A list of product objects that should be ordered
+        - `retailer_credentials` - Your account login details
+        - `payment_method` - Credit card or gift card balance
+        - `billing_address` - Address associated with payment method
+        - `shipping_method` or `shipping` - The desired shipping method
+        - `shipping_address` - Where the order will be delivered
+        - `is_gift` - Boolean indicating if this is a gift order
+    </Tab>
+
+    <Tab title="Zinc Managed Accounts (ZMA)">
+        Fund a balance with Zinc and we'll place orders using our managed retailer accounts. No need to create or maintain your own accounts.
+
+        **Required fields:**
+        - `addax: true` - Enables ZMA ordering
+        - `retailer` - The retailer code of the [supported retailer](/supported-retailers)
+        - `products` - A list of product objects that should be ordered
+        - `shipping_address` - Where the order will be delivered
+        - `is_gift` - Boolean indicating if this is a gift order
+        - `max_price` - Maximum price in cents for the order
+
+        **Excluded fields:**
+        - `retailer_credentials`
+        - `payment_method`  
+        - `billing_address`
+
+        <Info>
+        **ZMA Queue System:** Orders are queued until a suitable fulfillment account is available. Default timeout is 4 hours. You can customize this with `"addax_queue_timeout": 14400` (seconds).
+        </Info>
+
+        <Warning>
+        **ZMA Availability:** Currently available for Amazon.com only. [Contact sales](mailto:sales@zinc.io) to set up funding options.
+        </Warning>
+    </Tab>
+</Tabs>
+
+## Order Flow
+
+Making an order request will start an order. You'll receive a `request_id` in the response which you'll then use for retrieving the status of the order. The following illustration shows the flow for a typical order.
+
+<Frame caption="Order status flow for a typical Zinc order">
+  <img src="/images/orders.png" alt="Order Status Flow" />
+</Frame>
+<br />
+<AccordionGroup>
+    <Accordion title="Selecting an offer & shipping">
+
+    When placing an order, each product will have multiple offers from different sellers each with their own shipping options. To address this, use a product's seller selection criteria to filter offers and an order's shipping parameter to specify shipping preferences. Below is a flowchart of the process used to filter offers and select a shipping option.
+
+    <Frame caption="Flow chart for making an order">
+    <img src="/images/select-offer.svg" alt="Offer selection flow chart" />
+    </Frame>
+
+    ### Default seller selection criteria
+
+    If a seller selection criteria object is not explicitly provided, then the API will use the default:
+    ```json
+    { 
+    "prime": true, 
+    "handling_days_max": 6, 
+    "condition_in": ["New"] 
+    }
+    ```
+
+    ### Some examples
+
+    **Tracking within 5 days:**  
+    If you wanted to send your customer a tracking number within 5 days, you would set `handling_days_max` to `5` in your seller selection criteria. The Zinc API would then filter out all offers which would not ship and upload a tracking number within 5 days.
+
+    **Handling days filtering:**  
+    If you specified `"handling_days_max": 6` in your seller selection criteria, then any offer that won't ship in 6 days or less from now would be excluded from your buying selection. Thus, if two sellers are offering the same product, but one has a guaranteed shipping date 10 days away and the other seller has a guaranteed shipping date 5 days away, the second seller's offer would be selected.
+
+    <Info>
+    When no handling information is available, we use the longest projected arrival date of the product as the `handling_days_max`.
+    </Info>
+
+    **Shipping method selection:**  
+    If you set `"max_days": 5` on the shipping parameter, the Zinc API would attempt to select the cheapest shipping method that took fewer than 5 days to arrive. Thus, if there was a shipping method that took 3 days and cost ten dollars and another shipping method that took 7 days but cost two dollars, the first shipping option would be selected.
+
+    </Accordion>
+</AccordionGroup>

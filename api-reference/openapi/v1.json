@@ -201,6 +201,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Error response when order cannot be aborted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessingError"
+                }
+              }
+            }
           }
         }
       }
@@ -511,6 +521,72 @@
           }
         }
       }
+    },
+    "/v1/orders/{order_id}/case": {
+      "get": {
+        "summary": "Retrieve Case",
+        "description": "Get the status and history of a case for a Managed Account order",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order ID to retrieve case information for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Case information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create or Update Case",
+        "description": "Open a new case or add a message to an existing case for a Managed Account order",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order ID to create or update a case for"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case created or updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -521,16 +597,12 @@
           "retailer",
           "products",
           "shipping_address",
-          "billing_address",
-          "payment_method",
-          "retailer_credentials",
-          "max_price",
-          "shipping_method"
+          "is_gift"
         ],
         "properties": {
           "retailer": {
             "type": "string",
-            "description": "The retailer code of the supported retailer."
+            "description": "The retailer code of the [supported retailer](/supported-retailers)."
           },
           "products": {
             "type": "array",
@@ -545,6 +617,10 @@
                 "quantity": {
                   "type": "integer",
                   "description": "The number of units to order."
+                },
+                "seller_selection_criteria": {
+                  "$ref": "#/components/schemas/SellerSelectionCriteria",
+                  "description": "A seller selection criteria object containing information about which offers to choose when there are multiple offers available."
                 }
               },
               "required": ["product_id", "quantity"]
@@ -556,19 +632,27 @@
           },
           "shipping_method": {
             "type": "string",
-            "description": "The desired shipping method for the object. Available methods are cheapest (always select the cheapest method available), fastest (always select the fastest method available), amazon_day (choose default from Amazon or use amazon_day attribute from order), or free (which will fail for items without some sort of free shipping). You must provide either this or the shipping attribute, but not both."
+            "description": "The desired shipping method for the object. Available methods are `cheapest` (always select the cheapest method available), `fastest` (always select the fastest method available), `amazon_day` (choose default from Amazon or use `amazon_day` attribute from order), or `free`  (which will fail for items without some sort of free shipping). You must provide either this or the `shipping` attribute, but not both."
+          },
+          "shipping": {
+            "$ref": "#/components/schemas/Shipping",
+            "description": "A shipping object with information as to which shipping method to use. You must provide either this or the `shipping_method` attribute, but not both."
           },
           "billing_address": {
             "$ref": "#/components/schemas/Address",
-            "description": "An address object for the person associated with the credit card."
+            "description": "An address object for the person associated with the credit card. Required for self-managed accounts. Do not include when using ZMA (`addax: true`)."
           },
           "payment_method": {
             "$ref": "#/components/schemas/PaymentMethod",
-            "description": "A payment method object containing payment information for the order."
+            "description": "A payment method object containing payment information for the order. Required for self-managed accounts. Do not include when using ZMA (`addax: true`)."
           },
           "retailer_credentials": {
             "$ref": "#/components/schemas/RetailerCredentials",
-            "description": "A retailer credentials object for logging into the retailer with a preexisting account."
+            "description": "A retailer credentials object for logging into the retailer with a preexisting account. Required for self-managed accounts. Do not include when using ZMA (`addax: true`)."
+          },
+          "addax": {
+            "type": "boolean",
+            "description": "Set to true to enable Zinc Managed Accounts (ZMA). When true, do not include `retailer_credentials`, `payment_method`, or `billing_address` fields."
           },
           "is_gift": {
             "type": "boolean",
@@ -580,15 +664,10 @@
           },
           "require_gift": {
             "type": "boolean",
-            "description": "If is_gift is true, setting require_gift to true will cause the order to fail if any items in the order do not include a gift option."
-          },
-          "shipping": {
-            "$ref": "#/components/schemas/Shipping",
-            "description": "A shipping object with information as to which shipping method to use. You must provide either this or the shipping_method attribute, but not both."
+            "description": "If `is_gift` is true, setting `require_gift` to true will cause the order to fail if any items in the order do not include a gift option."
           },
           "webhooks": {
-            "type": "object",
-            "description": "A webhooks object including URLs that will receive POST requests after particular events have finished."
+            "$ref": "#/components/schemas/WebhooksObject"
           },
           "client_notes": {
             "type": "object",
@@ -596,12 +675,12 @@
           },
           "promo_codes": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": { "$ref": "#/components/schemas/PromoCode" },
             "description": "A list of promotion codes to use at checkout."
           },
           "strict_expired_product_id": {
             "type": "boolean",
-            "description": "Defaults to false. If true, fail orders where the product_id is 'expired' or 'deprecated'. If unset or false, Amazon redirects to a valid product_id and buys that one."
+            "description": "Defaults to false. If `true`, fail orders where the `product_id` is `expired` or `deprecated`. If unset or `false`, Amazon redirects to a valid `product_id` and buys that one."
           },
           "po_number": {
             "type": "number",
@@ -613,11 +692,11 @@
           },
           "fail_if_taxed": {
             "type": "boolean",
-            "description": "Defaults to false. If true, fail orders where taxes are included in the total. Useful for ZMA orders which should not be placed if no tax exempt account is available."
+            "description": "Defaults to `false`. If `true`, fail orders where taxes are included in the total. Useful for ZMA orders which should not be placed if no tax exempt account is available."
           },
           "max_delivery_days": {
             "type": "number",
-            "description": "(Amazon only) Defaults to unlimited. If set, fail orders with error max_delivery_days_exceeded if the retailer estimates delivery more than this many days in the future."
+            "description": "(Amazon only) Defaults to unlimited. If set, fail orders with error `max_delivery_days_exceeded` if the retailer estimates delivery more than this many days in the future."
           },
           "take_buybox_offers": {
             "type": "boolean",
@@ -625,27 +704,27 @@
           },
           "force_offers_postal_code": {
             "type": "string",
-            "description": "Uses this postal code for offer selection instead of the shipping_address.zip_code value."
+            "description": "Uses this postal code for offer selection instead of the `shipping_address.zip_code` value."
           },
           "zma_discount": {
             "type": "number",
-            "description": "The percent below (or above, if negative) face value that you will be charged for this order. Can range from -50 to 0. Lower discount orders will be processed before higher discount orders. If discount is too high and we are unable to secure ordering at that discount, the order will time out with zma_temporarily_overloaded. Defaults to 0%."
+            "description": "The percent below (or above, if negative) face value that you will be charged for this order. Can range from `-50` to `0`. Lower discount orders will be processed before higher discount orders. If discount is too high and we are unable to secure ordering at that discount, the order will time out with  `zma_temporarily_overloaded`. Defaults to `0`."
           },
           "addax_queue_timeout": {
             "type": "number",
-            "description": "Defaults to 14400. Number of seconds an order will stay in the ZMA queue before timing out with zma_temporarily_overloaded."
+            "description": "Defaults to `14400`. Number of seconds an order will stay in the ZMA queue before timing out with `zma_temporarily_overloaded`."
           },
           "zma_prime_optout": {
             "type": "boolean",
-            "description": "Defaults to false. Set this value to true to force your ZMA order to use a non-prime fulfillment account."
+            "description": "Defaults to `false`. Set this value to `true` to force your ZMA order to use a non-prime fulfillment account."
           },
           "zma_priority_bid": {
             "type": "number",
-            "description": "A fixed-value bid used to prioritize ZMA orders. Successful orders will include the bid value in their ZMA cost. A value of 100 equals a bid of $1.00. Orders with higher bids get a higher priority."
+            "description": "A fixed-value bid used to prioritize ZMA orders. Successful orders will include the bid value in their ZMA cost. A value of `100` equals a bid of $1.00. Orders with higher bids get a higher priority."
           },
           "max_price": {
             "type": "integer",
-            "description": "The maximum price in cents for the order. If the final price exceeds this number, the order will not go through and will return a max_price_exceeded error."
+            "description": "The maximum price in cents for the order. If the final price exceeds this number, the order will not go through and will return a `max_price_exceeded` error. Required for ZMA orders (`addax: true`)."
           }
         }
       },
@@ -697,6 +776,7 @@
       },
       "CancellationRequest": {
         "type": "object",
+        "required": ["merchant_order_id"],
         "properties": {
           "merchant_order_id": {
             "type": "string",
@@ -704,7 +784,7 @@
           },
           "webhooks": {
             "$ref": "#/components/schemas/WebhooksObject",
-            "description": "A webhooks object including URLs that will receive POST requests after request_succeeded and request_failed"
+            "description": "A webhooks object including URLs that will receive POST requests after `request_succeeded` and `request_failed`"
           }
         }
       },
@@ -769,7 +849,7 @@
             "description": "An array of ordered products and their given delivery dates"
           },
           "account_status": {
-            "type": "array",
+            "$ref": "#/components/schemas/AccountStatus",
             "description": "(Amazon only) An account status object that gives details about the ordering account"
           }
         }
@@ -784,8 +864,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Error code",
-            "enum": ["request_processing"]
+            "description": "Error code. Most commonly `request_processing`, but can be any error code from the [Error Handling](/api-reference/introduction/error-handling) documentation."
           },
           "message": {
             "type": "string",
@@ -879,19 +958,44 @@
         }
       },
       "Address": {
-        "type": "object",
-        "properties": {
-          "first_name": { "type": "string" },
-          "last_name": { "type": "string" },
-          "address_line1": { "type": "string" },
-          "address_line2": { "type": "string" },
-          "zip_code": { "type": "string" },
-          "city": { "type": "string" },
-          "state": { "type": "string" },
-          "country": { "type": "string" },
-          "phone_number": { "type": "string" }
-        }
-      },
+          "type": "object",
+          "required": ["first_name", "last_name", "address_line1",  "city", "state", "zip_code", "country", "phone_number"],
+          "properties": {
+            "first_name": { 
+              "type": "string"
+            },
+            "last_name": { 
+              "type": "string"
+            },
+            "address_line1": { 
+              "type": "string"
+            },
+            "address_line2": { 
+              "type": "string"
+            },
+            "zip_code": { 
+              "type": "string"
+            },
+            "city": { 
+              "type": "string"
+            },
+            "state": { 
+              "type": "string",
+              "description": "The USPS abbreviation for the state of the address (e.g. AK)"
+            },
+            "country": { 
+              "type": "string",
+              "description": "The ISO abbreviation for the country of the address (e.g. US). A list of all available two-letter country codes can be found [here](https://www.theodora.com/country_digraphs.html)."
+            },
+            "phone_number": { 
+              "type": "string"
+            },
+            "instructions": { 
+              "type": "string",
+              "description": "Optional instructions to include with the shipping addresses"
+            }
+          }
+        },
       "PaymentMethod": {
         "type": "object",
         "properties": {
@@ -913,10 +1017,85 @@
       },
       "Shipping": {
         "type": "object",
+        "required": ["order_by", "max_days", "max_price"],
         "properties": {
-          "order_by": { "type": "string" },
-          "max_days": { "type": "integer" },
-          "max_price": { "type": "integer" }
+          "order_by": { 
+            "type": "string",
+            "description": "The ordering of available shipping methods that meet the desired criteria. Available values are `price` or `speed`. If ordering by price, then the Zinc API will choose the cheapest shipping method that meets the desired criteria, while speed will choose the fastest shipping method meeting the criteria."
+          },
+          "max_days": { 
+            "type": "integer",
+            "description": "The maximum number of days allowed for shipping on the order."
+          },
+          "max_price": { 
+            "type": "integer",
+            "description": "The maximum price in cents allowed for the shipping cost of the order."
+          }
+        }
+      },
+      "SellerSelectionCriteria": {
+        "type": "object",
+        "properties": {
+          "addon": { 
+            "type": "boolean",
+            "description": "(Amazon only) Specifies whether the selected offer should be an addon item"
+          },
+          "buy_box": { 
+            "type": "boolean",
+            "description": "(Amazon only) Specifies whether the selected offer should be Amazon's default buy box offer"
+          },
+          "condition_in": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "An array of item conditions that the Zinc API must order from"
+          },
+          "condition_not_in": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "An array of item conditions that the Zinc API must not order from"
+          },
+          "first_party_seller": { 
+            "type": "boolean",
+            "description": "Is the seller first-party? e.g. sold by Walmart.com on walmart"
+          },
+          "handling_days_max": { 
+            "type": "integer",
+            "description": "The maximum number of allowable days for shipping and handling"
+          },
+          "international": { 
+            "type": "boolean",
+            "description": "Specifies whether the item should come from an international supplier"
+          },
+          "max_item_price": { 
+            "type": "integer",
+            "description": "The maximum allowable price in cents for an item"
+          },
+          "merchant_id_in": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "(Amazon only) An array of merchant ids that the Zinc API must order from"
+          },
+          "merchant_id_not_in": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "(Amazon only) An array of merchant ids that the Zinc API must not order from"
+          },
+          "min_seller_num_ratings": { 
+            "type": "integer",
+            "description": "(Amazon only) The minimum number of ratings required for an Amazon seller's offer to be selected"
+          },
+          "min_seller_percent_positive_feedback": { 
+            "type": "integer",
+            "description": "(Amazon only) The minimum percentage of positive ratings of an Amazon seller for their offer to be selected"
+          },
+          "prime": { 
+            "type": "boolean",
+            "description": "(Amazon only) Specifies whether the selected offer should be an Amazon Prime offer"
+          },
+          "allow_oos": { 
+            "type": "boolean",
+            "description": "(Amazon only) Specifies whether we should still attempt to complete ordering with the cheapest offer if all offers appear unavailable"
+          }
         }
       },
       "CreateReturnRequest": {
@@ -942,11 +1121,11 @@
           },
           "reason_code": {
             "type": "string",
-            "description": "The reason for the return. This is passed directly to Amazon. Reason codes will vary depending on Amazon country."
+            "description": "The reason for the return. This is passed directly to Amazon. Reason codes will vary depending on Amazon country. Many users have had success using \"inaccurate website description\" for Amazon.com and \"description on website was not accurate\" for Amazon.co.uk. Note that the `reason_code` must be an exact match with the reason code dropdown available on Amazon."
           },
           "method_code": {
             "type": "string",
-            "description": "The method of returning the specified products. This is passed directly to Amazon."
+            "description": "The method of returning the specified products. This is passed directly to Amazon. The available options may vary based on Amazon country and customer address. Note that `UPS Dropoff` is the only method supported for automatic refunds on Zinc Managed Account orders. If you'd like to use a different method, you'll need to manually request a refund."
           },
           "explanation": {
             "type": "string",
@@ -1010,7 +1189,7 @@
           },
           "request": {
             "type": "object",
-            "description": "The original request that was sent to the Zinc API"
+            "description": "The original order request that was sent to the Zinc API"
           }
         }
       },
@@ -1393,17 +1572,155 @@
           }
         }
       },
+      "AccountStatus": {
+        "type": "object",
+        "properties": {
+          "prime": {
+            "type": "boolean",
+            "description": "Indicates if the account has Prime enabled"
+          },
+          "fresh": {
+            "type": "boolean",
+            "description": "Indicates if the account has Fresh enabled"
+          },
+          "business": {
+            "type": "boolean",
+            "description": "Indicates if the account has Business enabled"
+          },
+          "charity": {
+            "type": "string",
+            "description": "Indicates if the account has a Charity associated"
+          }
+        }
+      },
+      "PromoCode": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The promo code to apply (required)"
+          },
+          "optional": {
+            "type": "boolean",
+            "description": "Should we continue placing the order if this code fails to apply? Defaults to false."
+          },
+          "merchant_id": {
+            "type": "string",
+            "description": "If supplied, only try this code if we selected an offer from the given merchant."
+          },
+          "discount_amount": {
+            "type": "number",
+            "description": "Fixed amount in cents by which we should discount the matching merchant's offers during offer selection. Only makes sense if merchant_id is also supplied. Defaults to 0."
+          },
+          "discount_percentage": {
+            "type": "number",
+            "description": "Percentage amount (between 0 and 100) by which we should discount the matching merchant's offers during offer selection. Only makes sense if merchant_id is also supplied. Defaults to 0."
+          },
+          "cost_override": {
+            "type": "number",
+            "description": "If supplied, we will assume all offers by this merchant cost exactly this many cents. Only makes sense if merchant_id is also supplied. Overrides other discount methods."
+          }
+        }
+      },
+      "CaseRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "The reason for opening a case (required when opening a new case)",
+            "enum": [
+              "return.request_label",
+              "nondelivery.not_delivered",
+              "nondelivery.damaged",
+              "nondelivery.empty_box",
+              "tracking.request_update",
+              "cancel.forced_cancellation",
+              "other"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Message content for the case"
+          }
+        },
+        "required": ["message"]
+      },
+      "CaseResponse": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "Current state of the case",
+            "enum": ["open", "closed"],
+            "nullable": true
+          },
+          "messages": {
+            "type": "array",
+            "description": "Array of case messages and updates",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Type of case message",
+                  "enum": [
+                    "case.opened.return.request_label",
+                    "case.opened.nondelivery.not_delivered",
+                    "case.opened.nondelivery.damaged",
+                    "case.opened.nondelivery.empty_box",
+                    "case.opened.tracking.request_update",
+                    "case.opened.cancel.forced_cancellation",
+                    "case.opened.other",
+                    "case.freetext",
+                    "case.return.label_generated",
+                    "case.return.status_updated",
+                    "case.refund.partial",
+                    "case.refund.full",
+                    "case.closed"
+                  ]
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Message content"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the message was created"
+                }
+              }
+            }
+          }
+        }
+      },
       "WebhooksObject": {
         "type": "object",
-        "description": "A webhooks object including URLs that will receive POST requests after particular events have finished",
+        "description": "A webhooks object including URLs that will receive `POST` requests after particular events have finished. See [Webhooks](/api-reference/introduction/webhooks) for more details.",
         "properties": {
           "request_succeeded": {
             "type": "string",
-            "description": "URL to receive success webhooks"
+            "description": "The webhook URL to send data to when a request succeeds"
           },
           "request_failed": {
             "type": "string",
-            "description": "URL to receive failure webhooks"
+            "description": "The webhook URL to send data to when a request fails"
+          },
+          "tracking_obtained": {
+            "type": "string",
+            "description": "The webhook URL to send data to when ALL tracking for an order is retrieved (placing orders call only)"
+          },
+          "tracking_updated": {
+            "type": "string",
+            "description": "The webhook URL to send data to when ANY tracking for an order is retrieved (placing orders call only)"
+          },
+          "status_updated": {
+            "type": "string",
+            "description": "The webhook URL to send data to when the status of a request is updated"
+          },
+          "case_updated": {
+            "type": "string",
+            "description": "The webhook URL to send data to when a ZMA case associated with the order receives an update"
           }
         }
       }

@@ -8,6 +8,7 @@
   --primary-dark: 41 39 36;        /* #292724 */
   --background-light: 255 254 249; /* #FFFEF9 (matches your lightest) */
   --background-dark: 41 39 36;     /* #292724 (main text/dark) */
+  --grey-900: #29272480 !important;
 }
 
 

@@ -62,7 +62,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Name of the retailer to include orders from"
+            "description": "Name of the retailer to include orders from. See [Supported Retailers](/supported-retailers) for a list of supported retailers."
           }
         ],
         "responses": {
@@ -392,7 +392,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The retailer for the product"
+            "description": "The retailer for the product. See [Supported Retailers](/supported-retailers) for a list of supported retailers."
           },
           {
             "name": "max_age",
@@ -401,7 +401,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "A number in seconds setting the maximum age of the response. Cannot specify with newer_than."
+            "description": "A number in seconds setting the maximum age of the response. Cannot specify with `newer_than`."
           },
           {
             "name": "newer_than",
@@ -410,7 +410,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "A timestamp setting the minimum time the response should be retrieved from. Cannot specify with max_age."
+            "description": "A timestamp setting the minimum time the response should be retrieved from. Cannot specify with `max_age`."
           },
           {
             "name": "async",
@@ -467,7 +467,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The retailer to search in"
+            "description": "The retailer for the product. See [Supported Retailers](/supported-retailers) for a list of supported retailers."
           }
         ],
         "responses": {
@@ -496,7 +496,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The product ID"
+            "description": "The retailer's unique identifier for a particular product"
           },
           {
             "name": "retailer",
@@ -505,7 +505,35 @@
             "schema": {
               "type": "string"
             },
-            "description": "The retailer for the product"
+            "description": "The retailer for the product. See [Supported Retailers](/supported-retailers) for a list of supported retailers."
+          },
+          {
+            "name": "max_age",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "A number in seconds setting the maximum age of the response. Cannot specify with `newer_than`."
+          },
+          {
+            "name": "newer_than",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "A timestamp setting the minimum time the response should be retrieved from. Cannot specify with `max_age`."
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Determines whether the resulting response will be asynchronous. Defaults to false."
           }
         ],
         "responses": {
@@ -1243,7 +1271,7 @@
         "properties": {
           "status": {
             "type": "string",
-            "description": "Possible values are processing, failed, or completed. You will only see processing if async: true was set on the request",
+            "description": "Status of the request. You will only see `processing` if `async: true` was set on the request",
             "enum": ["processing", "failed", "completed"]
           },
           "retailer": {
@@ -1370,60 +1398,23 @@
             }
           },
           "epids_map": {
-            "type": "object",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "description": "An array of the epids with the epid type as the field and the epid value as the value"
           },
           "package_dimensions": {
-            "type": "object",
-            "description": "An object detailing the packaging details if available",
-            "properties": {
-              "weight": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number"
-                  },
-                  "unit": {
-                    "type": "string"
-                  }
-                }
-              },
-              "size": {
-                "type": "object",
-                "properties": {
-                  "width": {
-                    "type": "object",
-                    "properties": {
-                      "amount": {
-                        "type": "number"
-                      },
-                      "unit": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "depth": {
-                    "type": "object",
-                    "properties": {
-                      "amount": {
-                        "type": "number"
-                      },
-                      "unit": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "length": {
-                    "type": "object",
-                    "properties": {
-                      "amount": {
-                        "type": "number"
-                      },
-                      "unit": {
-                        "type": "string"
-                      }
-                    }
-                  }
+            "type": "array",
+            "description": "An array detailing the packaging details if available. Each dimension contains a 'amount' and 'unit'",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
                 }
               }
             }
@@ -1438,7 +1429,7 @@
           },
           "price": {
             "type": "number",
-            "description": "(Amazon only) The price in cents of the buy box price of the item. This is not always returned and is often not the cheapest option."
+            "description": "(Amazon only) The price in cents of the buy box price of the item. **This is not always returned and is often not the cheapest option. If you want a product's price you should use [Product Offers](/api-reference/products/offers).**"
           },
           "review_count": {
             "type": "number",
@@ -1458,23 +1449,23 @@
           },
           "fresh": {
             "type": "boolean",
-            "description": "(Amazon only) True if the item is an Amazon Fresh item"
+            "description": "(Amazon only) `TRUE` if the item is an Amazon Fresh item"
           },
           "pantry": {
             "type": "boolean",
-            "description": "(Amazon only) True if the item is an Amazon Pantry item"
+            "description": "(Amazon only) `TRUE` if the item is an Amazon Pantry item"
           },
           "handmade": {
             "type": "boolean",
-            "description": "(Amazon only) True if the item is an Amazon Handmade item"
+            "description": "(Amazon only) `TRUE` if the item is an Amazon Handmade item"
           },
           "digital": {
             "type": "boolean",
-            "description": "(Amazon only) True if the item is a digital-only item"
+            "description": "(Amazon only) `TRUE` if the item is a digital-only item (software subscription, downloadable software, digital video, game codes, etc.)"
           },
           "buyapi_hint": {
             "type": "boolean",
-            "description": "(Amazon only) False if the item cannot be ordered via the buyapi, True if it might be orderable"
+            "description": "(Amazon only) False if the item cannot be ordered via the buyapi, `TRUE` if it might be orderable"
           },
           "item_number": {
             "type": "string",
@@ -1488,7 +1479,8 @@
         "properties": {
           "status": {
             "type": "string",
-            "description": "Status of the search request"
+            "description": "Status of the request. You will only see `processing` if `async: true` was set on the request",
+            "enum": ["processing", "failed", "completed"]
           },
           "timestamp": {
             "type": "number",
@@ -1541,33 +1533,20 @@
         "type": "object",
         "description": "Response for product offers",
         "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status of the request. You will only see `processing` if `async: true` was set on the request",
+            "enum": ["processing", "failed", "completed"]
+          },
+          "retailer": {
+            "type": "string",
+            "description": "The retailer for the product. See [Supported Retailers](/supported-retailers) for a list of supported retailers."
+          },
           "offers": {
             "type": "array",
             "description": "Array of offers for the product",
             "items": {
-              "type": "object",
-              "properties": {
-                "seller": {
-                  "type": "string",
-                  "description": "The seller name"
-                },
-                "price": {
-                  "type": "number",
-                  "description": "The offer price in cents"
-                },
-                "shipping": {
-                  "type": "number",
-                  "description": "The shipping cost in cents"
-                },
-                "condition": {
-                  "type": "string",
-                  "description": "The product condition"
-                },
-                "availability": {
-                  "type": "string",
-                  "description": "The availability status"
-                }
-              }
+              "$ref": "#/components/schemas/ProductOffer"
             }
           }
         }
@@ -1694,6 +1673,123 @@
           }
         }
       },
+      "ProductOffer": {
+        "type": "object",
+        "properties": {
+          "addon": {
+            "type": "boolean",
+            "description": "Whether or not the product is an addon item that can only be purchased in a bundle"
+          },
+          "condition": {
+            "type": "string",
+            "description": "The condition of the product",
+            "enum": [
+              "New",
+              "Refurbished",
+              "Used - Like New",
+              "Used - Very Good",
+              "Used - Good",
+              "Used - Acceptable",
+              "Unacceptable"
+            ]
+          },
+          "handling_days": {
+            "type": "object",
+            "properties": {
+              "max": {
+                "type": "number",
+                "description": "The maximum number of days required for shipping and handling"
+              },
+              "min": {
+                "type": "number",
+                "description": "The minimum number of days required for shipping and handling"
+              }
+            }
+          },
+          "international": {
+            "type": "boolean",
+            "description": "Whether or not the product ships from outside of the United States"
+          },
+          "offer_id": {
+            "type": "string",
+            "description": "(Amazon only). The unique identifier that identifies an item sold by any merchant on Amazon"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of the item, not including shipping in cents."
+          },
+          "marketplace_fulfilled": {
+            "type": "boolean",
+            "description": "Whether or not the product ships direct from retailer. For Amazon, this indicates if the item is shipped with Prime shipping."
+          },
+          "seller": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The merchant's unique identifier for the product"
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the seller of the current offer"
+              },
+              "num_ratings": {
+                "type": "number",
+                "description": "The number of ratings that the seller has accumulated"
+              },
+              "percent_positive": {
+                "type": "number",
+                "description": "Number between 0 and 100 denoting the percentage of positive ratings the seller has received"
+              },
+              "first_party": {
+                "type": "boolean",
+                "description": "Whether the seller is first-party"
+              }
+            }
+          },
+          "shipping_options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "number",
+                  "description": "The cost to ship the item in cents"
+                },
+                "delivery_days": {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "description": "The minimum time in days it might take for the item to be delivered"
+                    },
+                    "max": {
+                      "type": "number",
+                      "description": "The maximum time in days it might take for the item to be delivered"
+                    }
+                  }
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the shipping option"
+                }
+              }
+            }
+          },
+          "prime_only": {
+            "type": "boolean",
+            "description": "(Amazon only). Whether or not the product only ships using Amazon Prime"
+          },
+          "member_only": {
+            "type": "boolean",
+            "description": "(Costco only) Whether or not the purchase must be from a Costco Member"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the offer is currently available"
+          }
+        }
+      },
       "WebhooksObject": {
         "type": "object",
         "description": "A webhooks object including URLs that will receive `POST` requests after particular events have finished. See [Webhooks](/api-reference/introduction/webhooks) for more details.",
@@ -1728,7 +1824,7 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic",
+        "scheme": "basic", 
         "description": "Use your client token as the username. Leave the password blank."
       }
     }

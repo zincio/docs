@@ -113,7 +113,6 @@
       },
       {
         "version": "2.0.0 • Beta",
-       
         "tabs": [
           {
             "tab": "Guides",
@@ -122,27 +121,6 @@
                 "group": "Getting Started",
                 "pages": [
                   "index-v2"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "groups": [
-              {
-                "group": "Introduction",
-                "pages": [
-                  "api-reference/introduction/authentication",
-                  "api-reference/introduction/idempotency",
-                  "api-reference/introduction/error-handling",
-                  "api-reference/introduction/webhooks",
-                  "api-reference/introduction/accounts-payments"
-                ]
-              },
-              {
-                "group": "Orders",
-                "pages": [
-                  "api-reference/orders/create-v2"
                 ]
               }
             ]

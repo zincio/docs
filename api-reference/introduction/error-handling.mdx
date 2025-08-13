@@ -27,7 +27,7 @@ Every error object contains:
 | Error Code                          | Meaning                                                                                   |
 |:------------------------------------|:-------------------------------------------------------------------------------------------|
 |`account_locked`                      | The retailer asked for additional information to verify your account.                      |
-|`account_locked_verification_required`| The retailer emailed you a code which you must supply to continue ordering. <a href="/api-reference/appendix/amazon-email-verification">More Info</a> |
+|`account_locked_verification_required`| The retailer emailed you a code which you must supply to continue ordering. [More Info](/api-reference/appendix/amazon-email-verification) |
 |`account_login_failed`                | We were unable to log in to the retailer with the provided username and password.                  |
 |`add_on_item`                         | Add-on items cannot be ordered individually.                                               |
 |`additional_information_required`     | Retailer asked for additional account verification questions. If using the API, please add a field `phone_number` in the billing address that matches your billing telephone number.|
@@ -41,7 +41,7 @@ Every error object contains:
 |`insufficient_zma_balance`            | Insufficient funds in your Managed Account Balance to complete the order.                  |
 |`insufficient_variants`               | You did not select all required variants for a product.                                    |
 |`internal_error`                      | Zinc or the retailer is experiencing outages. Try again or contact support if it persists. |
-|`invalid_address`                     | The provided address was incomplete or could not be parsed. Try providing an address in <a href="/object-reference/address">canonical Zinc format</a> rather than free-form text.|
+|`invalid_address`                     | The provided address was incomplete or could not be parsed. Try providing an address in [canonical Zinc format](/object-reference/address) rather than free-form text.|
 |`invalid_card_number`                 | The credit card number you entered is not valid.                                          |
 |`invalid_client_token`                | Your client token is invalid.                                                             |
 |`invalid_expiration_date`             | The expiration date on your credit card is not valid.                                     |
@@ -74,7 +74,7 @@ Every error object contains:
 |`shipping_address_unavailable`        | The item(s) cannot be shipped to the selected shipping address.                           |
 |`shipping_method_unavailable`         | The selected `shipping_method` is not available for the selected `shipping_address`.           |
 |`unauthorized_access`                 | You are not authorized to make this API call. Please contact support@zinc.io.                                           |
-|`unknown_retailer`                    | The provided product URLs did not correspond to a known <a href="/supported-retailers">supported retailer</a>.               |
+|`unknown_retailer`                    | The provided product URLs did not correspond to a known [supported retailer](/supported-retailers).               |
 |`unsupported_product_id`              | The item `product_id` is not specific enough. Choose a specific `product_id` to order.|
 |`zma_temporarily_overloaded`          | The ZMA system was unable to place your order within 4 hours.Try again later, or check your parameters.|
 
